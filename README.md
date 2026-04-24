@@ -1,0 +1,318 @@
+# Wijaya Sports Club - Court Booking System
+
+A modern, full-featured court booking system for Wijaya Sports Club in Padukka, built with Next.js 16, Supabase, and TypeScript.
+
+## Features
+
+- **Public Booking Portal**: Customers can easily book badminton courts with real-time availability checking
+- **Admin Dashboard**: Manage bookings, approve/decline requests, and track booking statistics
+- **Email Notifications**: Automated email confirmations, approvals, and decline notifications
+- **Supabase Integration**: Secure database with Row Level Security (RLS) policies
+- **Responsive Design**: Beautiful, mobile-first UI with premium styling
+- **Real-time Availability**: Check court availability before booking
+- **Multi-court Booking**: Support for booking 1-6 courts simultaneously
+- **Status Management**: Track booking status (pending, approved, declined)
+
+## Tech Stack
+
+- **Frontend**: Next.js 16, React, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend**: Next.js API Routes, Supabase PostgreSQL
+- **Email**: Nodemailer (SMTP) or Resend
+- **Deployment**: Vercel
+
+## Project Structure
+
+```
+app/
+├── page.tsx                  # Public booking homepage
+├── admin/
+│   ├── page.tsx             # Admin login page
+│   └── dashboard/
+│       └── page.tsx         # Admin dashboard
+├── api/
+│   └── bookings/
+│       ├── route.ts         # GET/POST bookings
+│       └── [id]/route.ts    # PATCH/DELETE specific booking
+├── layout.tsx               # Root layout
+└── globals.css              # Global styles
+
+components/
+└── booking-form.tsx         # Booking form component
+
+lib/
+├── supabase.ts             # Supabase client and queries
+├── email.ts                # Email templates and sending
+└── auth.ts                 # Authentication utilities
+
+public/                      # Static assets
+```
+
+## Setup Instructions
+
+### 1. Prerequisites
+
+- Node.js 18+ 
+- npm, yarn, pnpm, or bun
+- Supabase account
+- SMTP email service (Gmail, SendGrid, etc.) or Resend account
+
+### 2. Database Setup
+
+The SQL schema has been created in your Supabase project with the following structure:
+
+**Courts Table**
+```sql
+CREATE TABLE courts (
+  id BIGSERIAL PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+```
+
+**Bookings Table**
+```sql
+CREATE TABLE bookings (
+  id BIGSERIAL PRIMARY KEY,
+  customer_name TEXT NOT NULL,
+  phone_number TEXT NOT NULL,
+  email TEXT NOT NULL,
+  booking_date DATE NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  number_of_courts INTEGER NOT NULL CHECK (number_of_courts > 0),
+  status booking_status NOT NULL DEFAULT 'pending',
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+```
+
+**Booking Status Enum**
+```sql
+CREATE TYPE booking_status AS ENUM ('pending', 'approved', 'declined');
+```
+
+Default courts (Court 1-6) have been pre-inserted into the database.
+
+### 3. Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# Email Configuration (SMTP)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+SMTP_FROM_EMAIL=noreply@wijayasports.com
+
+# Admin Settings
+NEXT_PUBLIC_ADMIN_PASSWORD=admin123
+ADMIN_EMAIL=admin@wijayasports.com
+
+# App Settings
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 4. Install Dependencies
+
+```bash
+pnpm install
+# or npm install / yarn install
+```
+
+### 5. Run Development Server
+
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Usage Guide
+
+### For Customers
+
+1. **Visit homepage** at `/`
+2. **Fill booking form**:
+   - Full Name, Email, Phone Number
+   - Booking Date, Number of Courts
+   - Start Time and End Time (auto-populated from available slots)
+3. **Submit booking request**
+4. **Check email** for confirmation
+
+### For Admins
+
+1. **Go to** `/admin`
+2. **Login** with password: `admin123`
+3. **Dashboard features**:
+   - View all bookings and statistics
+   - Filter by status (All, Pending, Approved, Declined)
+   - Approve pending bookings (sends approval email)
+   - Decline bookings (sends decline email)
+   - Delete bookings
+4. **Logout** when finished
+
+## Email Configuration
+
+### Using Gmail SMTP
+
+1. Enable 2-Factor Authentication in Google Account
+2. Generate App Password: https://myaccount.google.com/apppasswords
+3. Use the 16-character password in environment variables
+
+### Using SendGrid
+
+1. Create SendGrid account and verify sender email
+2. Generate API key in Settings
+3. Configure:
+```env
+SMTP_HOST=smtp.sendgrid.net
+SMTP_PORT=587
+SMTP_USER=apikey
+SMTP_PASSWORD=SG.xxxxxxxxxxxxxxxxxxxxx
+```
+
+## API Documentation
+
+### Create Booking
+```bash
+POST /api/bookings
+Content-Type: application/json
+
+{
+  "customer_name": "John Doe",
+  "phone_number": "+94XXXXXXXXXX",
+  "email": "john@example.com",
+  "booking_date": "2024-12-25",
+  "start_time": "18:00",
+  "end_time": "19:00",
+  "number_of_courts": 2
+}
+```
+
+### Get Bookings
+```bash
+GET /api/bookings
+```
+
+### Update Booking Status
+```bash
+PATCH /api/bookings/[id]
+Content-Type: application/json
+
+{
+  "status": "approved" | "declined"
+}
+```
+
+### Delete Booking
+```bash
+DELETE /api/bookings/[id]
+```
+
+## Availability Logic
+
+The system calculates available slots based on:
+- Total courts available (6 courts)
+- Existing bookings for selected date
+- Only approved/pending bookings block availability
+- Declined bookings do not affect availability
+- 30-minute time slot intervals (6 AM - 10 PM)
+
+## Deployment
+
+### Deploy to Vercel
+
+1. Push code to GitHub
+2. Connect repository to Vercel
+3. Set environment variables in Vercel Settings
+4. Deploy
+
+### Required Environment Variables in Vercel
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM_EMAIL`
+- `NEXT_PUBLIC_ADMIN_PASSWORD`
+- `ADMIN_EMAIL`
+- `NEXT_PUBLIC_APP_URL`
+
+## Customization
+
+### Change Admin Password
+```env
+NEXT_PUBLIC_ADMIN_PASSWORD=your_new_password
+```
+
+### Modify Operating Hours
+Edit `lib/supabase.ts`, `generateTimeSlots()` function:
+```typescript
+for (let hour = 6; hour < 22; hour++) { // Change hours as needed
+```
+
+### Customize Email Templates
+Edit `lib/email.ts` to modify email content, subject lines, and HTML templates.
+
+## Troubleshooting
+
+### Email Not Sending
+- Verify SMTP credentials are correct
+- For Gmail, use App Password (not regular password)
+- Check firewall allows SMTP port 587
+
+### Bookings Not Saving
+- Verify Supabase credentials in `.env.local`
+- Check database RLS policies are enabled
+- Verify tables exist in Supabase
+
+### Admin Login Not Working
+- Clear browser localStorage (DevTools > Application > Local Storage)
+- Verify password matches exactly
+- Check `NEXT_PUBLIC_ADMIN_PASSWORD` environment variable
+
+## Browser Support
+
+- Chrome/Edge 90+
+- Firefox 88+
+- Safari 14+
+- Mobile browsers (iOS Safari, Chrome Android)
+
+## Performance
+
+- Next.js 16 with Turbopack for faster builds
+- Server Components for database queries
+- Optimized images and CSS with Tailwind
+- Minimal JavaScript bundle size
+
+## Security
+
+- Row Level Security (RLS) at database level
+- Password-protected admin access
+- Server-side input validation
+- Environment variables for sensitive data
+- HTTPS recommended for production
+
+## Support
+
+For issues or questions, contact the development team.
+
+## License
+
+Proprietary - Wijaya Sports Club, Padukka
+
+## Changelog
+
+### Version 1.0.0 (Current)
+- Supabase integration with full database setup
+- Premium UI with responsive design
+- Email notifications (confirmation, approval, decline)
+- Admin dashboard with real-time booking management
+- Multi-court booking support (1-6 courts)
+- Real-time availability checking
+- RLS security policies
