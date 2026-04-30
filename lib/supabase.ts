@@ -7,10 +7,10 @@ if (!supabaseUrl || !supabaseKey) {
   console.warn('[v0] Supabase credentials not configured. Using demo mode.')
 }
 
-// Public client — uses anon key (subject to RLS)
+// Public client - uses anon key (subject to RLS)
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-// Server-only admin client — uses service role key (bypasses RLS)
+// Server-only admin client - uses service role key (bypasses RLS)
 // Only safe to use in API routes / server components, never in client components.
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseKey
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
@@ -125,7 +125,7 @@ export async function getAvailableSlots(
 ): Promise<{ start_time: string; end_time: string }[]> {
   const bookings = await getBookings({ booking_date: date })
   const courts = await getCourts()
-  
+
   const totalCourts = courts.length
   const timeSlots = generateTimeSlots()
 
@@ -261,19 +261,42 @@ export async function toggleCourtActive(id: number, is_active: boolean): Promise
   return data as Court
 }
 
+export async function renameCourt(id: number, name: string): Promise<Court | null> {
+  const { data, error } = await supabaseAdmin
+    .from('courts')
+    .update({ name })
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) {
+    console.error('[v0] Error renaming court:', error)
+    return null
+  }
+  return data as Court
+}
+
+export async function deleteCourt(id: number): Promise<boolean> {
+  const { error } = await supabaseAdmin.from('courts').delete().eq('id', id)
+  if (error) {
+    console.error('[v0] Error deleting court:', error)
+    return false
+  }
+  return true
+}
+
 // ─── Slot generation & availability ─────────────────────────────────────────
 
-const DEFAULT_OPEN  = '16:00'
+const DEFAULT_OPEN = '16:00'
 const DEFAULT_CLOSE = '22:00'
 
 function buildOperatingSlots(openTime: string, closeTime: string) {
-  const [openH]  = openTime.split(':').map(Number)
+  const [openH] = openTime.split(':').map(Number)
   const [closeH] = closeTime.split(':').map(Number)
   const slots = []
   for (let h = openH; h < closeH; h++) {
     slots.push({
       start_time: `${String(h).padStart(2, '0')}:00`,
-      end_time:   `${String(h + 1).padStart(2, '0')}:00`,
+      end_time: `${String(h + 1).padStart(2, '0')}:00`,
     })
   }
   return slots
@@ -293,7 +316,7 @@ export async function getSlotAvailability(
   closeTime: string = DEFAULT_CLOSE
 ): Promise<SlotAvailability[]> {
   const bookings = await getBookings({ booking_date: date })
-  const courts   = await getCourts()
+  const courts = await getCourts()
   const totalCourts = courts.length
   const operatingSlots = buildOperatingSlots(openTime, closeTime)
 
@@ -307,7 +330,7 @@ export async function getSlotAvailability(
 
     return {
       start_time: slot.start_time,
-      end_time:   slot.end_time,
+      end_time: slot.end_time,
       total_courts: totalCourts,
       booked_courts: bookedCourts,
       available_courts: Math.max(0, totalCourts - bookedCourts),
@@ -325,11 +348,11 @@ export async function isValidSlotForDate(
   endTime: string
 ): Promise<boolean> {
   const override = await getEffectiveOverride(date)
-  const openTime  = override?.open_time  ?? DEFAULT_OPEN
+  const openTime = override?.open_time ?? DEFAULT_OPEN
   const closeTime = override?.close_time ?? DEFAULT_CLOSE
   const slots = buildOperatingSlots(openTime, closeTime)
   const starts = slots.map((s) => s.start_time)
-  const ends   = slots.map((s) => s.end_time)
+  const ends = slots.map((s) => s.end_time)
   const si = starts.indexOf(startTime)
   const ei = ends.indexOf(endTime)
   return si !== -1 && ei !== -1 && si <= ei
@@ -342,7 +365,7 @@ export async function isRangeAvailable(
   requiredCourts: number
 ): Promise<boolean> {
   const bookings = await getBookings({ booking_date: date })
-  const courts   = await getCourts()
+  const courts = await getCourts()
   const totalCourts = courts.length
 
   const bookedCourts = bookings

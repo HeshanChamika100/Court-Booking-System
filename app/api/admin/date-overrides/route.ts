@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
             success: false,
             requiresConfirmation: true,
             affectedCount: affectedBookings.length,
-            message: `${affectedBookings.length} existing booking${affectedBookings.length !== 1 ? 's' : ''} will be affected. They will NOT be automatically cancelled — you may want to review them manually.`,
+            message: `${affectedBookings.length} existing booking${affectedBookings.length !== 1 ? 's' : ''} will be affected. They will NOT be automatically cancelled - you may want to review them manually.`,
           },
           { status: 409 }
         )

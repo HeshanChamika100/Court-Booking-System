@@ -71,11 +71,10 @@ function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
       {steps.map((s, i) => (
         <div key={s.n} className="flex items-center">
           <div className="flex flex-col items-center gap-1.5">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
-              current > s.n ? 'bg-primary text-primary-foreground' :
-              current === s.n ? 'bg-primary text-primary-foreground ring-4 ring-primary/20' :
-              'bg-muted text-muted-foreground'
-            }`}>{current > s.n ? '✓' : s.n}</div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${current > s.n ? 'bg-primary text-primary-foreground' :
+                current === s.n ? 'bg-primary text-primary-foreground ring-4 ring-primary/20' :
+                  'bg-muted text-muted-foreground'
+              }`}>{current > s.n ? '✓' : s.n}</div>
             <span className={`text-xs font-medium ${current >= s.n ? 'text-foreground' : 'text-muted-foreground'}`}>{s.label}</span>
           </div>
           {i < steps.length - 1 && (
@@ -172,7 +171,7 @@ export function BookingForm() {
         setSelectedRange({ start, end: end - 1 })
         setNumberOfCourts(prev => Math.min(prev, newMin))
       } else {
-        // Middle slot clicked — can't split a range, clear all
+        // Middle slot clicked - can't split a range, clear all
         setSelectedRange(null)
       }
       setError('')
@@ -209,7 +208,7 @@ export function BookingForm() {
     setError('')
     setSubmitting(true)
 
-    // Re-fetch current availability before submitting — catch stale data early
+    // Re-fetch current availability before submitting - catch stale data early
     try {
       const freshRes = await fetch(`/api/bookings/slots?date=${selectedDate}`)
       const freshData = await freshRes.json()
@@ -230,7 +229,7 @@ export function BookingForm() {
 
         if (freshMin < numberOfCourts) {
           setError(
-            `Availability changed — only ${freshMin} court${freshMin !== 1 ? 's' : ''} remaining for this slot. Please reduce your selection.`
+            `Availability changed - only ${freshMin} court${freshMin !== 1 ? 's' : ''} remaining for this slot. Please reduce your selection.`
           )
           setNumberOfCourts(freshMin)
           setSubmitting(false)
@@ -238,7 +237,7 @@ export function BookingForm() {
         }
       }
     } catch {
-      // If refresh fails, fall through — POST will validate server-side
+      // If refresh fails, fall through - POST will validate server-side
     }
 
     const startSlot = slots[selectedRange.start]
@@ -303,11 +302,11 @@ export function BookingForm() {
         )}
 
         <div className="space-y-6">
-          {/* Step 1 — Date */}
+          {/* Step 1 - Date */}
           <div>
             <label className="flex items-center gap-2 text-sm font-semibold text-foreground mb-2">
               <CalendarDays className="w-4 h-4 text-primary" />
-              Step 1 — Select a Date
+              Step 1 - Select a Date
             </label>
             <input
               type="date"
@@ -323,13 +322,13 @@ export function BookingForm() {
             )}
           </div>
 
-          {/* Step 2 — Slot grid */}
+          {/* Step 2 - Slot grid */}
           {selectedDate && (
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="flex items-center gap-2 text-sm font-semibold text-foreground">
                   <Clock className="w-4 h-4 text-primary" />
-                  Step 2 — Pick Time Slot(s)
+                  Step 2 - Pick Time Slot(s)
                 </label>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Plenty</span>
@@ -406,7 +405,7 @@ export function BookingForm() {
             </div>
           )}
 
-          {/* Step 3 — Court count + personal details */}
+          {/* Step 3 - Court count + personal details */}
           {selectedRange !== null && slots.length > 0 && (
             <div className="space-y-5 pt-2 border-t border-border/50">
               {/* Selection summary strip */}
@@ -432,7 +431,7 @@ export function BookingForm() {
               <div>
                 <label className="flex items-center gap-2 text-sm font-semibold text-foreground mb-1">
                   <Users className="w-4 h-4 text-primary" />
-                  Step 3a — How many courts?
+                  Step 3a - How many courts?
                 </label>
                 <p className="text-xs text-muted-foreground mb-3">
                   {availableCourtsForRange} court{availableCourtsForRange !== 1 ? 's' : ''} available across your selected time
@@ -443,11 +442,10 @@ export function BookingForm() {
                       key={n}
                       type="button"
                       onClick={() => setNumberOfCourts(n)}
-                      className={`w-12 h-12 rounded-xl border-2 font-bold text-sm transition-all duration-150 ${
-                        numberOfCourts === n
+                      className={`w-12 h-12 rounded-xl border-2 font-bold text-sm transition-all duration-150 ${numberOfCourts === n
                           ? 'bg-primary border-primary text-primary-foreground shadow-md shadow-primary/20 scale-105'
                           : 'border-border hover:border-primary/50 text-foreground hover:scale-105'
-                      }`}
+                        }`}
                     >
                       {n}
                     </button>
@@ -459,7 +457,7 @@ export function BookingForm() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <p className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <ChevronRight className="w-4 h-4 text-primary" />
-                  Step 3b — Your Details
+                  Step 3b - Your Details
                 </p>
 
                 <div>

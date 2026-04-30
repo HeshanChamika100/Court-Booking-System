@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createBooking, getBookings, isRangeAvailable, isValidSlotForDate, getEffectiveOverride } from '@/lib/supabase'
 import { getBookingConfirmationEmail, sendEmail } from '@/lib/email'
 import { format } from 'date-fns'
+import { formatTimeWithoutSeconds } from '@/lib/utils'
 
 export async function GET(request: NextRequest) {
   try {
@@ -86,8 +87,8 @@ export async function POST(request: NextRequest) {
     const confirmationEmail = getBookingConfirmationEmail(
       customer_name,
       format(new Date(booking_date), 'MMMM dd, yyyy'),
-      start_time,
-      end_time,
+      formatTimeWithoutSeconds(start_time),
+      formatTimeWithoutSeconds(end_time),
       number_of_courts
     )
 

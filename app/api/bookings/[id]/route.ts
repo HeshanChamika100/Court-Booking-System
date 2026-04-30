@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getBookingById, updateBookingStatus, deleteBooking } from '@/lib/supabase'
 import { getApprovalEmail, getDeclinedEmail, sendEmail } from '@/lib/email'
 import { format } from 'date-fns'
+import { formatTimeWithoutSeconds } from '@/lib/utils'
 
 export async function GET(
   request: NextRequest,
@@ -80,7 +81,7 @@ export async function PATCH(
         return NextResponse.json(
           {
             success: false,
-            message: `Cannot approve: only ${totalCourts - alreadyApproved} court(s) available for ${booking.start_time}–${booking.end_time} on ${booking.booking_date}. This booking requests ${booking.number_of_courts}.`,
+            message: `Cannot approve: only ${totalCourts - alreadyApproved} court(s) available for ${formatTimeWithoutSeconds(booking.start_time)}–${formatTimeWithoutSeconds(booking.end_time)} on ${booking.booking_date}. This booking requests ${booking.number_of_courts}.`,
           },
           { status: 409 }
         )
@@ -103,8 +104,8 @@ export async function PATCH(
       emailTemplate = getApprovalEmail(
         booking.customer_name,
         format(new Date(booking.booking_date), 'MMMM dd, yyyy'),
-        booking.start_time,
-        booking.end_time,
+        formatTimeWithoutSeconds(booking.start_time),
+        formatTimeWithoutSeconds(booking.end_time),
         booking.number_of_courts
       )
     } else {

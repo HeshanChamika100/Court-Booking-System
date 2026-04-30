@@ -9,6 +9,7 @@ import { Check, X, Trash2, LogOut, Calendar, Clock, Home, AlertCircle } from 'lu
 import { format } from 'date-fns'
 import { type Booking } from '@/lib/supabase'
 import { CourtManagement } from '@/components/court-management'
+import { formatTimeTo12Hour } from '@/lib/utils'
 
 export default function AdminDashboard() {
   const router = useRouter()
@@ -278,7 +279,7 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex items-center gap-2 text-muted-foreground text-xs">
                           <Clock className="w-3 h-3" />
-                          {booking.start_time} - {booking.end_time}
+                          {formatTimeTo12Hour(booking.start_time)} - {formatTimeTo12Hour(booking.end_time)}
                         </div>
                       </td>
                       <td className="py-4 px-4 text-center">
