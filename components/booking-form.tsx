@@ -276,17 +276,17 @@ export function BookingForm() {
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <Card className="p-8 border border-border/50 shadow-xl">
-        <div className="text-center mb-6">
-          <h2 className="text-3xl font-bold text-foreground">Book Your Court</h2>
-          <p className="text-muted-foreground mt-1">Wijaya Sports Club · 4:00 PM – 10:00 PM daily</p>
+      <Card className="border border-white/20 bg-white/92 p-6 shadow-2xl shadow-black/20 ring-1 ring-white/30 backdrop-blur-2xl md:p-8">
+        <div className="mb-6 text-center">
+          <h2 className="text-3xl font-semibold tracking-tight text-slate-950">Book Your Court</h2>
+          <p className="mt-1 text-sm text-slate-600">Wijaya Sports Club · 4:00 PM – 10:00 PM daily</p>
         </div>
 
         <StepIndicator current={step} />
 
         {success && (
           <div className="mb-6 flex gap-3 p-5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl">
-            <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+            <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
             <div>
               <p className="text-emerald-600 font-semibold">Booking Request Submitted!</p>
               <p className="text-emerald-600/80 text-sm mt-0.5">We'll review your request and send a confirmation email shortly.</p>
@@ -296,7 +296,7 @@ export function BookingForm() {
 
         {error && (
           <div className="mb-6 flex gap-3 p-4 bg-destructive/10 border border-destructive/30 rounded-xl">
-            <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
             <p className="text-destructive text-sm">{error}</p>
           </div>
         )}
@@ -344,7 +344,7 @@ export function BookingForm() {
               {/* Duration pill */}
               {selectedRange !== null && (
                 <div className="mb-3 px-3 py-2 bg-primary/10 border border-primary/30 rounded-lg text-xs font-medium text-primary flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5 flex-shrink-0" />
+                  <Clock className="w-3.5 h-3.5 shrink-0" />
                   <span>
                     {durationHours} hr{durationHours > 1 ? 's' : ''}{' '} selected
                     &nbsp;·&nbsp;
@@ -385,7 +385,7 @@ export function BookingForm() {
                         className={`p-4 rounded-xl border-2 transition-all duration-200 text-left select-none ${style.container} ${isSelected ? 'ring-2 ring-primary/40 ring-offset-2 ring-offset-background' : ''}`}
                       >
                         <div className="flex items-center gap-1.5 mb-2.5">
-                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${style.dot}`} />
+                          <span className={`w-2 h-2 rounded-full shrink-0 ${style.dot}`} />
                           <span className={`text-xs font-medium ${isSelected ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
                             {style.topLabel}
                           </span>
@@ -410,7 +410,7 @@ export function BookingForm() {
             <div className="space-y-5 pt-2 border-t border-border/50">
               {/* Selection summary strip */}
               <div className="flex items-center gap-3 p-3 bg-primary/8 border border-primary/20 rounded-lg">
-                <div className="w-9 h-9 bg-primary/15 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-9 h-9 bg-primary/15 rounded-lg flex items-center justify-center shrink-0">
                   <Clock className="w-4 h-4 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -422,7 +422,7 @@ export function BookingForm() {
                     {format(new Date(selectedDate + 'T00:00:00'), 'EEEE, MMMM dd, yyyy')}
                   </p>
                 </div>
-                <button type="button" onClick={() => { setSelectedRange(null); setError('') }} className="text-xs text-primary hover:underline flex-shrink-0">
+                <button type="button" onClick={() => { setSelectedRange(null); setError('') }} className="text-xs text-primary hover:underline shrink-0">
                   Change
                 </button>
               </div>
