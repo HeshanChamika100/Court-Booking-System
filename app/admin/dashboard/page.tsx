@@ -148,13 +148,18 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
+    <div
+      className="relative min-h-screen overflow-hidden bg-cover bg-center bg-fixed"
+      style={{ backgroundImage: "url('/badminton-wallpaper-admin.jpg')" }}
+    >
+      <div className="absolute inset-0 bg-black/60" />
+      <div className="relative z-10">
       {/* Header */}
-      <header className="border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <header className="border-b border-white/15 bg-black/35 backdrop-blur supports-backdrop-filter:bg-black/20 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
-            <p className="text-sm text-muted-foreground">Manage court bookings</p>
+            <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
+            <p className="text-sm text-white/80">Manage court bookings</p>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/">
@@ -174,20 +179,20 @@ export default function AdminDashboard() {
       <main className="container mx-auto px-4 py-8">
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card className="p-6 border border-border/50">
-            <p className="text-sm text-muted-foreground mb-2">Total Bookings</p>
-            <p className="text-3xl font-bold text-foreground">{stats.total}</p>
+          <Card className="p-6 border border-white/15 bg-black/45 backdrop-blur-sm">
+            <p className="text-sm text-white/75 mb-2">Total Bookings</p>
+            <p className="text-3xl font-bold text-white">{stats.total}</p>
           </Card>
-          <Card className="p-6 border border-border/50 bg-yellow-50/50 dark:bg-yellow-950/20">
-            <p className="text-sm text-muted-foreground mb-2">Pending</p>
+          <Card className="p-6 border border-white/15 bg-black/45 backdrop-blur-sm">
+            <p className="text-sm text-white/75 mb-2">Pending</p>
             <p className="text-3xl font-bold text-yellow-700 dark:text-yellow-400">{stats.pending}</p>
           </Card>
-          <Card className="p-6 border border-border/50 bg-green-50/50 dark:bg-green-950/20">
-            <p className="text-sm text-muted-foreground mb-2">Approved</p>
+          <Card className="p-6 border border-white/15 bg-black/45 backdrop-blur-sm">
+            <p className="text-sm text-white/75 mb-2">Approved</p>
             <p className="text-3xl font-bold text-green-700 dark:text-green-400">{stats.approved}</p>
           </Card>
-          <Card className="p-6 border border-border/50 bg-red-50/50 dark:bg-red-950/20">
-            <p className="text-sm text-muted-foreground mb-2">Declined</p>
+          <Card className="p-6 border border-white/15 bg-black/45 backdrop-blur-sm">
+            <p className="text-sm text-white/75 mb-2">Declined</p>
             <p className="text-3xl font-bold text-red-700 dark:text-red-400">{stats.declined}</p>
           </Card>
         </div>
@@ -216,7 +221,7 @@ export default function AdminDashboard() {
 
         {actionError && (
           <div className="flex gap-3 p-4 mb-4 bg-destructive/10 border border-destructive/30 rounded-lg">
-            <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
             <p className="text-destructive text-sm">{actionError}</p>
           </div>
         )}
@@ -236,28 +241,28 @@ export default function AdminDashboard() {
         </div>
 
         {/* Bookings Table */}
-        <Card className="border border-border/50">
-          <div className="p-6 border-b border-border/50">
-            <h2 className="text-lg font-semibold text-foreground">Bookings</h2>
-            <p className="text-sm text-muted-foreground">Showing {filteredBookings.length} of {bookings.length} bookings</p>
+        <Card className="border border-white/15 bg-black/45 backdrop-blur-sm">
+          <div className="p-6 border-b border-white/15">
+            <h2 className="text-lg font-semibold text-white">Bookings</h2>
+            <p className="text-sm text-white/75">Showing {filteredBookings.length} of {bookings.length} bookings</p>
           </div>
           <div className="overflow-x-auto">
             {loading ? (
               <div className="flex justify-center items-center py-12">
-                <p className="text-muted-foreground">Loading bookings...</p>
+                <p className="text-white/75">Loading bookings...</p>
               </div>
             ) : filteredBookings.length === 0 ? (
               <div className="flex justify-center items-center py-12">
-                <p className="text-muted-foreground">No bookings found</p>
+                <p className="text-white/75">No bookings found</p>
               </div>
             ) : (
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border/50 bg-muted/50">
-                    <th className="text-left py-3 px-4 font-semibold text-foreground">Name</th>
-                    <th className="text-left py-3 px-4 font-semibold text-foreground">Contact</th>
-                    <th className="text-left py-3 px-4 font-semibold text-foreground">Date & Time</th>
-                    <th className="text-center py-3 px-4 font-semibold text-foreground">Courts</th>
+                  <tr className="border-b border-white/15 bg-black/30">
+                    <th className="text-left py-3 px-4 font-semibold text-white">Name</th>
+                    <th className="text-left py-3 px-4 font-semibold text-white">Contact</th>
+                    <th className="text-left py-3 px-4 font-semibold text-white">Date & Time</th>
+                    <th className="text-center py-3 px-4 font-semibold text-white">Courts</th>
                     <th className="text-center py-3 px-4 font-semibold text-foreground">Status</th>
                     <th className="text-right py-3 px-4 font-semibold text-foreground">Actions</th>
                   </tr>
@@ -327,6 +332,7 @@ export default function AdminDashboard() {
         </Card>
         </>) }
       </main>
+      </div>
     </div>
   )
 }
