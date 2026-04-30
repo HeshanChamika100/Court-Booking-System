@@ -142,9 +142,26 @@ export function BookingForm() {
 
     const { start, end } = selectedRange
 
-    // Click within selection → deselect
+    // Click within selection → smart trim from edges, or clear if middle
     if (i >= start && i <= end) {
-      setSelectedRange(null)
+      if (i === start && i === end) {
+        // Only one slot selected → clear entirely
+        setSelectedRange(null)
+      } else if (i === start) {
+        // Remove the first slot from the range
+        const newMin = Math.min(...slots.slice(start + 1, end + 1).map(s => s.available_courts))
+        setSelectedRange({ start: start + 1, end })
+        setNumberOfCourts(prev => Math.min(prev, newMin))
+      } else if (i === end) {
+        // Remove the last slot from the range
+        const newMin = Math.min(...slots.slice(start, end).map(s => s.available_courts))
+        setSelectedRange({ start, end: end - 1 })
+        setNumberOfCourts(prev => Math.min(prev, newMin))
+      } else {
+        // Middle slot clicked — can't split a range, clear all
+        setSelectedRange(null)
+      }
+      setError('')
       return
     }
 
@@ -316,7 +333,7 @@ export function BookingForm() {
                 <div className="mb-3 px-3 py-2 bg-primary/10 border border-primary/30 rounded-lg text-xs font-medium text-primary flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5 flex-shrink-0" />
                   <span>
-                    {durationHours} hr{durationHours > 1 ? 's' : ''} selected
+                    {durationHours} hr{durationHours > 1 ? 's' : ''}{' '} selected
                     &nbsp;·&nbsp;
                     {formatTime(slots[selectedRange.start].start_time)} – {formatTime(slots[selectedRange.end].end_time)}
                   </span>
