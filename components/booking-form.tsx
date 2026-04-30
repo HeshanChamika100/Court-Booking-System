@@ -97,6 +97,8 @@ export function BookingForm() {
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
+  const [isClosed, setIsClosed] = useState(false)
+  const [closedNote, setClosedNote] = useState<string | null>(null)
 
   // Derived
   const selectedSlots = selectedRange !== null ? slots.slice(selectedRange.start, selectedRange.end + 1) : []
@@ -109,11 +111,21 @@ export function BookingForm() {
     setError('')
     setSlots([])
     setSelectedRange(null)
+    setIsClosed(false)
+    setClosedNote(null)
     try {
       const res = await fetch(`/api/bookings/slots?date=${date}`)
       const data = await res.json()
-      if (data.success) setSlots(data.data)
-      else setError('Could not load availability. Please try again.')
+      if (data.success) {
+        if (data.closed) {
+          setIsClosed(true)
+          setClosedNote(data.note ?? null)
+        } else {
+          setSlots(data.data)
+        }
+      } else {
+        setError('Could not load availability. Please try again.')
+      }
     } catch {
       setError('Could not load availability. Please try again.')
     } finally {
@@ -125,6 +137,8 @@ export function BookingForm() {
     const date = e.target.value
     setSelectedDate(date)
     setSelectedRange(null)
+    setIsClosed(false)
+    setClosedNote(null)
     setError('')
     if (date) fetchSlots(date)
   }
@@ -343,12 +357,19 @@ export function BookingForm() {
                 </div>
               )}
 
-              {slotsLoading ? (
+              {isClosed ? (
+                <div className="flex flex-col items-center justify-center py-10 gap-3 bg-red-500/8 border border-red-500/30 rounded-xl">
+                  <span className="text-3xl">🚫</span>
+                  <p className="font-semibold text-foreground">No bookings on this date</p>
+                  {closedNote && <p className="text-sm text-muted-foreground">{closedNote}</p>}
+                </div>
+              ) : slotsLoading ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-3 bg-muted/20 rounded-xl border border-border/40">
                   <Loader2 className="w-8 h-8 text-primary animate-spin" />
                   <p className="text-sm text-muted-foreground">Checking availability…</p>
                 </div>
               ) : (
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {slots.map((slot, i) => {
                     const isSelected = selectedRange !== null && i >= selectedRange.start && i <= selectedRange.end

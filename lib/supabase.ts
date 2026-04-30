@@ -43,19 +43,6 @@ export type AdminUser = {
   created_at: string
 }
 
-// Helper functions
-export async function getCourts() {
-  const { data, error } = await supabaseAdmin
-    .from('courts')
-    .select('*')
-    .eq('is_active', true)
-
-  if (error) {
-    console.error('[v0] Error fetching courts:', error)
-    return []
-  }
-  return data as Court[]
-}
 
 export async function getBookings(filters?: { status?: string; booking_date?: string }) {
   let query = supabaseAdmin.from('bookings').select('*')
@@ -163,15 +150,134 @@ export async function getAvailableSlots(
   return availableSlots
 }
 
-// The 6 operating slots: 4 PM – 10 PM (1-hour each)
-const OPERATING_SLOTS = [
-  { start_time: '16:00', end_time: '17:00' },
-  { start_time: '17:00', end_time: '18:00' },
-  { start_time: '18:00', end_time: '19:00' },
-  { start_time: '19:00', end_time: '20:00' },
-  { start_time: '20:00', end_time: '21:00' },
-  { start_time: '21:00', end_time: '22:00' },
-]
+
+// ─── Date Overrides ──────────────────────────────────────────────────────────
+
+export type DateOverride = {
+  id: number
+  date: string | null        // 'YYYY-MM-DD' specific date, or null
+  day_of_week: number | null // 0=Sun … 6=Sat recurring rule, or null
+  is_closed: boolean
+  open_time: string | null   // 'HH:MM', null = use default
+  close_time: string | null  // 'HH:MM', null = use default
+  note: string | null
+  created_at: string
+}
+
+export async function getDateOverrides(): Promise<DateOverride[]> {
+  const { data, error } = await supabaseAdmin
+    .from('date_overrides')
+    .select('*')
+    .order('created_at', { ascending: false })
+  if (error) {
+    console.error('[v0] Error fetching date overrides:', error)
+    return []
+  }
+  return data as DateOverride[]
+}
+
+/** Returns the active override for a date: specific-date rule wins over day-of-week rule. */
+export async function getEffectiveOverride(date: string): Promise<DateOverride | null> {
+  const overrides = await getDateOverrides()
+  const specific = overrides.find((o) => o.date === date)
+  if (specific) return specific
+  const dow = new Date(date + 'T00:00:00').getDay()
+  return overrides.find((o) => o.day_of_week === dow && o.date === null) ?? null
+}
+
+export async function createDateOverride(
+  payload: Omit<DateOverride, 'id' | 'created_at'>
+): Promise<DateOverride | null> {
+  const { data, error } = await supabaseAdmin
+    .from('date_overrides')
+    .insert([payload])
+    .select()
+    .single()
+  if (error) {
+    console.error('[v0] Error creating date override:', error)
+    return null
+  }
+  return data as DateOverride
+}
+
+export async function deleteDateOverride(id: number): Promise<boolean> {
+  const { error } = await supabaseAdmin.from('date_overrides').delete().eq('id', id)
+  if (error) {
+    console.error('[v0] Error deleting date override:', error)
+    return false
+  }
+  return true
+}
+
+// ─── Courts ──────────────────────────────────────────────────────────────────
+
+/** Returns only active courts (used for capacity calculations). */
+export async function getCourts() {
+  const { data, error } = await supabaseAdmin
+    .from('courts')
+    .select('*')
+    .eq('is_active', true)
+  if (error) {
+    console.error('[v0] Error fetching courts:', error)
+    return []
+  }
+  return data as Court[]
+}
+
+/** Returns ALL courts including inactive ones (used for admin management). */
+export async function getAllCourts(): Promise<Court[]> {
+  const { data, error } = await supabaseAdmin.from('courts').select('*').order('id')
+  if (error) {
+    console.error('[v0] Error fetching all courts:', error)
+    return []
+  }
+  return data as Court[]
+}
+
+export async function createCourt(name: string): Promise<Court | null> {
+  const { data, error } = await supabaseAdmin
+    .from('courts')
+    .insert([{ name, is_active: true }])
+    .select()
+    .single()
+  if (error) {
+    console.error('[v0] Error creating court:', error)
+    return null
+  }
+  return data as Court
+}
+
+export async function toggleCourtActive(id: number, is_active: boolean): Promise<Court | null> {
+  const { data, error } = await supabaseAdmin
+    .from('courts')
+    .update({ is_active })
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) {
+    console.error('[v0] Error toggling court active:', error)
+    return null
+  }
+  return data as Court
+}
+
+// ─── Slot generation & availability ─────────────────────────────────────────
+
+const DEFAULT_OPEN  = '16:00'
+const DEFAULT_CLOSE = '22:00'
+
+function buildOperatingSlots(openTime: string, closeTime: string) {
+  const [openH]  = openTime.split(':').map(Number)
+  const [closeH] = closeTime.split(':').map(Number)
+  const slots = []
+  for (let h = openH; h < closeH; h++) {
+    slots.push({
+      start_time: `${String(h).padStart(2, '0')}:00`,
+      end_time:   `${String(h + 1).padStart(2, '0')}:00`,
+    })
+  }
+  return slots
+}
 
 export type SlotAvailability = {
   start_time: string
@@ -181,23 +287,27 @@ export type SlotAvailability = {
   available_courts: number
 }
 
-export async function getSlotAvailability(date: string): Promise<SlotAvailability[]> {
+export async function getSlotAvailability(
+  date: string,
+  openTime: string = DEFAULT_OPEN,
+  closeTime: string = DEFAULT_CLOSE
+): Promise<SlotAvailability[]> {
   const bookings = await getBookings({ booking_date: date })
-  const courts = await getCourts()
+  const courts   = await getCourts()
   const totalCourts = courts.length
+  const operatingSlots = buildOperatingSlots(openTime, closeTime)
 
-  return OPERATING_SLOTS.map((slot) => {
+  return operatingSlots.map((slot) => {
     const bookedCourts = bookings
-      .filter((booking) => {
-        if (booking.status === 'declined') return false
-        // Overlap: booking starts before our slot ends AND booking ends after our slot starts
-        return booking.start_time < slot.end_time && booking.end_time > slot.start_time
+      .filter((b) => {
+        if (b.status === 'declined') return false
+        return b.start_time < slot.end_time && b.end_time > slot.start_time
       })
-      .reduce((sum, booking) => sum + booking.number_of_courts, 0)
+      .reduce((sum, b) => sum + b.number_of_courts, 0)
 
     return {
       start_time: slot.start_time,
-      end_time: slot.end_time,
+      end_time:   slot.end_time,
       total_courts: totalCourts,
       booked_courts: bookedCourts,
       available_courts: Math.max(0, totalCourts - bookedCourts),
@@ -205,8 +315,25 @@ export async function getSlotAvailability(date: string): Promise<SlotAvailabilit
   })
 }
 
-export const VALID_SLOT_STARTS = ['16:00', '17:00', '18:00', '19:00', '20:00', '21:00']
-export const VALID_SLOT_ENDS   = ['17:00', '18:00', '19:00', '20:00', '21:00', '22:00']
+/**
+ * Validates that start_time and end_time form a contiguous multi-slot range
+ * within the operating hours for this date (respecting date overrides).
+ */
+export async function isValidSlotForDate(
+  date: string,
+  startTime: string,
+  endTime: string
+): Promise<boolean> {
+  const override = await getEffectiveOverride(date)
+  const openTime  = override?.open_time  ?? DEFAULT_OPEN
+  const closeTime = override?.close_time ?? DEFAULT_CLOSE
+  const slots = buildOperatingSlots(openTime, closeTime)
+  const starts = slots.map((s) => s.start_time)
+  const ends   = slots.map((s) => s.end_time)
+  const si = starts.indexOf(startTime)
+  const ei = ends.indexOf(endTime)
+  return si !== -1 && ei !== -1 && si <= ei
+}
 
 export async function isRangeAvailable(
   date: string,
@@ -215,34 +342,15 @@ export async function isRangeAvailable(
   requiredCourts: number
 ): Promise<boolean> {
   const bookings = await getBookings({ booking_date: date })
-  const courts = await getCourts()
+  const courts   = await getCourts()
   const totalCourts = courts.length
 
-  // Count courts already booked for any booking that overlaps [startTime, endTime)
   const bookedCourts = bookings
-    .filter((booking) => {
-      if (booking.status === 'declined') return false
-      // Overlap condition: booking starts before our end AND booking ends after our start
-      return booking.start_time < endTime && booking.end_time > startTime
+    .filter((b) => {
+      if (b.status === 'declined') return false
+      return b.start_time < endTime && b.end_time > startTime
     })
-    .reduce((sum, booking) => sum + booking.number_of_courts, 0)
+    .reduce((sum, b) => sum + b.number_of_courts, 0)
 
   return totalCourts - bookedCourts >= requiredCourts
-}
-
-function generateTimeSlots() {
-  const slots = []
-  for (let hour = 6; hour < 22; hour++) {
-    for (let minute = 0; minute < 60; minute += 30) {
-      const startTime = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
-      const endHour = minute === 30 ? hour + 1 : hour
-      const endMinute = minute === 30 ? 0 : 30
-      const endTime = `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`
-
-      if (endHour < 23) {
-        slots.push({ start_time: startTime, end_time: endTime })
-      }
-    }
-  }
-  return slots
 }

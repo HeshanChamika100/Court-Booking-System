@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSlotAvailability } from '@/lib/supabase'
+import { getSlotAvailability, getEffectiveOverride } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,8 +13,21 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const slots = await getSlotAvailability(date)
-    return NextResponse.json({ success: true, data: slots }, { status: 200 })
+    // Check if this date has an override (closed or custom hours)
+    const override = await getEffectiveOverride(date)
+
+    if (override?.is_closed) {
+      return NextResponse.json(
+        { success: true, closed: true, note: override.note, data: [] },
+        { status: 200 }
+      )
+    }
+
+    const openTime  = override?.open_time  ?? '16:00'
+    const closeTime = override?.close_time ?? '22:00'
+
+    const slots = await getSlotAvailability(date, openTime, closeTime)
+    return NextResponse.json({ success: true, closed: false, data: slots }, { status: 200 })
   } catch (error) {
     console.error('[v0] Error fetching slot availability:', error)
     return NextResponse.json(

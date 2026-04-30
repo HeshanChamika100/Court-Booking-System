@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card'
 import { Check, X, Trash2, LogOut, Calendar, Clock, Home, AlertCircle } from 'lucide-react'
 import { format } from 'date-fns'
 import { type Booking } from '@/lib/supabase'
+import { CourtManagement } from '@/components/court-management'
 
 export default function AdminDashboard() {
   const router = useRouter()
@@ -16,6 +17,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<number | null>(null)
   const [actionError, setActionError] = useState('')
+  const [activeTab, setActiveTab] = useState<'bookings' | 'courts'>('bookings')
 
   useEffect(() => {
     const token = localStorage.getItem('admin_token')
@@ -189,7 +191,28 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        {/* Capacity error banner */}
+        {/* Tab switcher */}
+        <div className="flex gap-2 mb-6">
+          <Button
+            variant={activeTab === 'bookings' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('bookings')}
+          >
+            Bookings
+          </Button>
+          <Button
+            variant={activeTab === 'courts' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('courts')}
+          >
+            Court Management
+          </Button>
+        </div>
+
+        {activeTab === 'courts' ? (
+          <CourtManagement />
+        ) : (<>
+
         {actionError && (
           <div className="flex gap-3 p-4 mb-4 bg-destructive/10 border border-destructive/30 rounded-lg">
             <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
@@ -301,6 +324,7 @@ export default function AdminDashboard() {
             )}
           </div>
         </Card>
+        </>) }
       </main>
     </div>
   )
