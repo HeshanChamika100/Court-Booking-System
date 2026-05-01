@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { toggleCourtActive, renameCourt, deleteCourt } from '@/lib/supabase'
+import { isAdminRequestAuthorized } from '@/lib/admin-session'
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!isAdminRequestAuthorized(request)) {
+    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const { id } = await params
     const body = await request.json()
@@ -40,6 +45,10 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!isAdminRequestAuthorized(_request)) {
+    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const { id } = await params
     const ok = await deleteCourt(parseInt(id))

@@ -92,40 +92,14 @@ CREATE TYPE booking_status AS ENUM ('pending', 'approved', 'declined');
 ```
 
 Default courts (Court 1-6) have been pre-inserted into the database.
-
-### 3. Environment Variables
-
-Create a `.env.local` file in the root directory:
-
-```env
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-# Email Configuration (SMTP)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your_email@gmail.com
-SMTP_PASSWORD=your_app_password
-SMTP_FROM_EMAIL=noreply@wijayasports.com
-
-# Admin Settings
-NEXT_PUBLIC_ADMIN_PASSWORD=admin123
-ADMIN_EMAIL=admin@wijayasports.com
-
-# App Settings
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
-### 4. Install Dependencies
+### 3. Install Dependencies
 
 ```bash
 pnpm install
 # or npm install / yarn install
 ```
 
-### 5. Run Development Server
+### 4. Run Development Server
 
 ```bash
 pnpm dev
@@ -148,7 +122,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ### For Admins
 
 1. **Go to** `/admin`
-2. **Login** with password: `admin123`
+2. **Login** with the password configured in `ADMIN_PASSWORD`
 3. **Dashboard features**:
    - View all bookings and statistics
    - Filter by status (All, Pending, Approved, Declined)
@@ -239,7 +213,8 @@ The system calculates available slots based on:
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM_EMAIL`
-- `NEXT_PUBLIC_ADMIN_PASSWORD`
+- `ADMIN_PASSWORD`
+- `ADMIN_SESSION_SECRET`
 - `ADMIN_EMAIL`
 - `NEXT_PUBLIC_APP_URL`
 
@@ -247,7 +222,8 @@ The system calculates available slots based on:
 
 ### Change Admin Password
 ```env
-NEXT_PUBLIC_ADMIN_PASSWORD=your_new_password
+ADMIN_PASSWORD=your_new_password
+ADMIN_SESSION_SECRET=generate_a_random_long_secret
 ```
 
 ### Modify Operating Hours
@@ -272,9 +248,9 @@ Edit `lib/email.ts` to modify email content, subject lines, and HTML templates.
 - Verify tables exist in Supabase
 
 ### Admin Login Not Working
-- Clear browser localStorage (DevTools > Application > Local Storage)
+- Clear browser cookies for the site
 - Verify password matches exactly
-- Check `NEXT_PUBLIC_ADMIN_PASSWORD` environment variable
+- Check `ADMIN_PASSWORD` and `ADMIN_SESSION_SECRET` environment variables
 
 ## Browser Support
 

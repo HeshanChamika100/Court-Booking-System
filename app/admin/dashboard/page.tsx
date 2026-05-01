@@ -17,24 +17,41 @@ export default function AdminDashboard() {
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'declined' | 'cancelled'>('all')
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'tomorrow' | 'yesterday' | 'week' | 'month'>('all')
   const [loading, setLoading] = useState(true)
+  const [checkingSession, setCheckingSession] = useState(true)
   const [actionLoading, setActionLoading] = useState<number | null>(null)
   const [actionError, setActionError] = useState('')
   const [activeTab, setActiveTab] = useState<'bookings' | 'courts'>('bookings')
   const [deleteConfirm, setDeleteConfirm] = useState<Booking | null>(null)
 
   useEffect(() => {
-    const token = localStorage.getItem('admin_token')
-    if (!token) {
-      router.push('/admin')
-    } else {
-      loadBookings()
+    const checkSession = async () => {
+      try {
+        const res = await fetch('/api/admin/session')
+        if (!res.ok) {
+          router.push('/admin')
+          return
+        }
+
+        await loadBookings()
+      } catch {
+        router.push('/admin')
+      } finally {
+        setCheckingSession(false)
+      }
     }
+
+    void checkSession()
   }, [router])
 
   const loadBookings = async () => {
     setLoading(true)
     try {
       const res = await fetch('/api/bookings')
+      if (res.status === 401) {
+        router.push('/admin')
+        return
+      }
+
       const data = await res.json()
       if (data.success) setBookings(data.data)
       else console.error('[v0] Error loading bookings:', data.message)
@@ -54,6 +71,11 @@ export default function AdminDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'approved' }),
       })
+      if (res.status === 401) {
+        router.push('/admin')
+        return
+      }
+
       const data = await res.json()
       if (data.success) {
         setBookings((prev) => prev.map((b) => (b.id === id ? data.data : b)))
@@ -77,6 +99,11 @@ export default function AdminDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'declined' }),
       })
+      if (res.status === 401) {
+        router.push('/admin')
+        return
+      }
+
       const data = await res.json()
       if (data.success) {
         setBookings((prev) => prev.map((b) => (b.id === id ? data.data : b)))
@@ -94,6 +121,11 @@ export default function AdminDashboard() {
     setActionLoading(id)
     try {
       const res = await fetch(`/api/bookings/${id}`, { method: 'DELETE' })
+      if (res.status === 401) {
+        router.push('/admin')
+        return
+      }
+
       const data = await res.json()
       if (data.success) {
         setBookings((prev) => prev.filter((b) => b.id !== id))
@@ -109,9 +141,9 @@ export default function AdminDashboard() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('admin_token')
-    localStorage.removeItem('admin_login_time')
-    router.push('/admin')
+    void fetch('/api/admin/logout', { method: 'POST' }).finally(() => {
+      router.push('/admin')
+    })
   }
 
   const isBookingInDateRange = (bookingDate: string): boolean => {
@@ -179,6 +211,14 @@ export default function AdminDashboard() {
       default:
         return null
     }
+  }
+
+  if (checkingSession) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+        <p className="text-sm uppercase tracking-[0.3em] text-white/70">Verifying admin session</p>
+      </div>
+    )
   }
 
   return (

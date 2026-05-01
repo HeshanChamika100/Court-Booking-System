@@ -3,11 +3,16 @@ import { getBookingById, updateBookingStatus, deleteBooking } from '@/lib/supaba
 import { getApprovalEmail, getDeclinedEmail, sendEmail } from '@/lib/email'
 import { format } from 'date-fns'
 import { formatTimeWithoutSeconds } from '@/lib/utils'
+import { isAdminRequestAuthorized } from '@/lib/admin-session'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!isAdminRequestAuthorized(request)) {
+    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const { id } = await params
     const bookingId = parseInt(id)
@@ -34,6 +39,10 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!isAdminRequestAuthorized(request)) {
+    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const { id } = await params
     const bookingId = parseInt(id)
@@ -131,6 +140,10 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!isAdminRequestAuthorized(request)) {
+    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const { id } = await params
     const bookingId = parseInt(id)

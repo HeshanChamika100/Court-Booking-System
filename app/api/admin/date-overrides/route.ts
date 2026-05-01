@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDateOverrides, createDateOverride, getBookings } from '@/lib/supabase'
+import { isAdminRequestAuthorized } from '@/lib/admin-session'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  if (!isAdminRequestAuthorized(request)) {
+    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const overrides = await getDateOverrides()
     return NextResponse.json({ success: true, data: overrides })
@@ -11,6 +16,10 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  if (!isAdminRequestAuthorized(request)) {
+    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const body = await request.json()
     const { date, day_of_week, is_closed, open_time, close_time, note, force } = body
