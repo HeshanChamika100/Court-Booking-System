@@ -324,6 +324,12 @@ export function BookingForm() {
               </span>
             </div>
             <div className="flex items-start justify-between gap-4">
+              <span className="text-muted-foreground">Hours</span>
+              <span className="font-medium text-right">
+                {selectedRange ? `${durationHours} hour${durationHours !== 1 ? 's' : ''}` : '-'}
+              </span>
+            </div>
+            <div className="flex items-start justify-between gap-4">
               <span className="text-muted-foreground">Courts</span>
               <span className="font-medium text-right">{numberOfCourts}</span>
             </div>
@@ -568,9 +574,14 @@ export function BookingForm() {
                     <Input
                       id="booking_phone"
                       type="tel"
-                      placeholder="+94 XX XXX XXXX"
+                      inputMode="numeric"
+                      maxLength={10}
+                      placeholder="07 XX XXX XXX"
                       value={formData.phone_number}
-                      onChange={e => setFormData(p => ({ ...p, phone_number: e.target.value }))}
+                      onChange={e => {
+                        const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 10)
+                        setFormData(p => ({ ...p, phone_number: digitsOnly }))
+                      }}
                       required
                       className="bg-background border-input"
                     />
