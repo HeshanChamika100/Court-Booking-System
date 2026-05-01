@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Check, X, Trash2, LogOut, Calendar, Clock, Home, AlertCircle } from 'lucide-react'
-import { format } from 'date-fns'
+import { format, startOfToday, endOfToday, startOfTomorrow, endOfTomorrow, subDays, addDays, startOfDay, endOfDay } from 'date-fns'
 import { type Booking } from '@/lib/supabase'
 import { CourtManagement } from '@/components/court-management'
 import { formatTimeTo12Hour } from '@/lib/utils'
@@ -15,6 +15,7 @@ export default function AdminDashboard() {
   const router = useRouter()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'declined'>('all')
+  const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'tomorrow' | 'yesterday' | '7days' | '30days'>('all')
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<number | null>(null)
   const [actionError, setActionError] = useState('')
@@ -113,7 +114,35 @@ export default function AdminDashboard() {
     router.push('/admin')
   }
 
-  const filteredBookings = filter === 'all' ? bookings : bookings.filter((b) => b.status === filter)
+  const isBookingInDateRange = (bookingDate: string): boolean => {
+    const bookDate = new Date(bookingDate)
+    const today = new Date()
+
+    switch (dateFilter) {
+      case 'today':
+        return bookDate >= startOfToday() && bookDate <= endOfToday()
+      case 'tomorrow':
+        return bookDate >= startOfTomorrow() && bookDate <= endOfTomorrow()
+      case 'yesterday':
+        const yesterday = subDays(new Date(), 1)
+        return bookDate >= startOfDay(yesterday) && bookDate <= endOfDay(yesterday)
+      case '7days':
+        const next7Days = addDays(today, 7)
+        return bookDate >= startOfToday() && bookDate <= endOfDay(next7Days)
+      case '30days':
+        const next30Days = addDays(today, 30)
+        return bookDate >= startOfToday() && bookDate <= endOfDay(next30Days)
+      case 'all':
+      default:
+        return true
+    }
+  }
+
+  const filteredBookings = bookings.filter((b) => {
+    const statusMatch = filter === 'all' ? true : b.status === filter
+    const dateMatch = isBookingInDateRange(b.booking_date)
+    return statusMatch && dateMatch
+  })
 
   const stats = {
     total: bookings.length,
@@ -239,17 +268,49 @@ export default function AdminDashboard() {
         )}
 
         {/* Filter Buttons */}
-        <div className="flex gap-2 mb-6 flex-wrap">
-          {(['all', 'pending', 'approved', 'declined'] as const).map((f) => (
-            <Button
-              key={f}
-              onClick={() => setFilter(f)}
-              variant={filter === f ? 'default' : 'outline'}
-              size="sm"
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </Button>
-          ))}
+        <div className="space-y-3 mb-6">
+          {/* Status Filter */}
+          <div>
+            <p className="text-sm font-medium text-muted-foreground mb-2">Status</p>
+            <div className="flex gap-2 flex-wrap">
+              {(['all', 'pending', 'approved', 'declined'] as const).map((f) => (
+                <Button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  variant={filter === f ? 'default' : 'outline'}
+                  size="sm"
+                >
+                  {f.charAt(0).toUpperCase() + f.slice(1)}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Date Filter */}
+          <div>
+            <p className="text-sm font-medium text-muted-foreground mb-2">Date Range</p>
+            <div className="flex gap-2 flex-wrap">
+              {(['all', 'today', 'tomorrow', 'yesterday', '7days', '30days'] as const).map((d) => {
+                let label = d.charAt(0).toUpperCase() + d.slice(1)
+                if (d === 'today') label = `Today (${format(new Date(), 'MMM d')})`
+                else if (d === 'tomorrow') label = `Tomorrow (${format(addDays(new Date(), 1), 'MMM d')})`
+                else if (d === 'yesterday') label = `Yesterday (${format(subDays(new Date(), 1), 'MMM d')})`
+                else if (d === '7days') label = 'Next 7 Days'
+                else if (d === '30days') label = 'Next 30 Days'
+
+                return (
+                  <Button
+                    key={d}
+                    onClick={() => setDateFilter(d)}
+                    variant={dateFilter === d ? 'default' : 'outline'}
+                    size="sm"
+                  >
+                    {label}
+                  </Button>
+                )
+              })}
+            </div>
+          </div>
         </div>
 
         {/* Bookings Table */}
