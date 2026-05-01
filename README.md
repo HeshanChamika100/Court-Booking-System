@@ -91,6 +91,17 @@ CREATE TABLE bookings (
 CREATE TYPE booking_status AS ENUM ('pending', 'approved', 'declined');
 ```
 
+**Admin Password Settings Table**
+```sql
+CREATE TABLE admin_settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+```
+
+The admin password reset flow stores the active password hash in this table under the `admin_password_hash` key.
+
 Default courts (Court 1-6) have been pre-inserted into the database.
 ### 3. Install Dependencies
 
@@ -251,6 +262,11 @@ Edit `lib/email.ts` to modify email content, subject lines, and HTML templates.
 - Clear browser cookies for the site
 - Verify password matches exactly
 - Check `ADMIN_PASSWORD` and `ADMIN_SESSION_SECRET` environment variables
+
+### Password Reset Not Working
+- Verify the `admin_settings` table exists in Supabase
+- Check `ADMIN_EMAIL` matches the inbox that receives reset links
+- Confirm `NEXT_PUBLIC_APP_URL` points to the correct site URL
 
 ## Browser Support
 

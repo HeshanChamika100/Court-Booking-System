@@ -86,6 +86,12 @@ export default function AdminLogin() {
               {!loading && <ArrowRight className="w-4 h-4" />}
             </Button>
           </form>
+
+          <div className="mt-4 text-center">
+            <Link href="/admin/reset" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Forgot password?
+            </Link>
+          </div>
         </Card>
 
         <div className="mt-6 text-center">

@@ -1,8 +1,5 @@
-export function getAdminPassword(): string {
-  return process.env.ADMIN_PASSWORD?.trim() ?? ''
-}
+import { verifyStoredAdminPassword } from '@/lib/admin-settings'
 
-export function verifyAdminPassword(password: string): boolean {
-  const adminPassword = getAdminPassword()
-  return adminPassword.length > 0 && password === adminPassword
+export async function verifyAdminPassword(password: string): Promise<boolean> {
+  return verifyStoredAdminPassword(password)
 }

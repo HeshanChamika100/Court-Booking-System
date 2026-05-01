@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}))
     const password = typeof body.password === 'string' ? body.password : ''
 
-    if (!verifyAdminPassword(password)) {
+    if (!(await verifyAdminPassword(password))) {
       return NextResponse.json({ success: false, message: 'Invalid admin password.' }, { status: 401 })
     }
 
