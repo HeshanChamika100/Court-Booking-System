@@ -126,19 +126,19 @@ export default function AdminDashboard() {
     switch (status) {
       case 'pending':
         return (
-          <span className="inline-flex items-center px-3 py-1 bg-yellow-600/10 text-yellow-300 text-xs font-semibold rounded-full ring-1 ring-yellow-600/10">
+          <span className="inline-flex items-center px-3 py-1.5 bg-amber-400 text-amber-950 text-xs font-bold rounded-full">
             Pending
           </span>
         )
       case 'approved':
         return (
-          <span className="inline-flex items-center px-3 py-1 bg-green-600/10 text-green-300 text-xs font-semibold rounded-full ring-1 ring-green-600/10">
+          <span className="inline-flex items-center px-3 py-1.5 bg-emerald-400 text-emerald-950 text-xs font-bold rounded-full">
             Approved
           </span>
         )
       case 'declined':
         return (
-          <span className="inline-flex items-center px-3 py-1 bg-red-600/10 text-red-300 text-xs font-semibold rounded-full ring-1 ring-red-600/10">
+          <span className="inline-flex items-center px-3 py-1.5 bg-rose-400 text-rose-950 text-xs font-bold rounded-full">
             Declined
           </span>
         )
@@ -253,35 +253,35 @@ export default function AdminDashboard() {
         </div>
 
         {/* Bookings Table */}
-        <Card className="rounded-2xl bg-slate-800/80 overflow-hidden">
-          <div className="p-4 border-b border-slate-700/30 bg-transparent">
-            <h2 className="text-lg font-semibold text-white">Bookings</h2>
-            <p className="text-sm text-white/75">Showing {filteredBookings.length} of {bookings.length} bookings</p>
+        <Card className="rounded-2xl bg-white overflow-hidden border border-border/50">
+          <div className="p-4 border-b border-border/30 bg-white">
+            <h2 className="text-lg font-semibold text-foreground">Bookings</h2>
+            <p className="text-sm text-muted-foreground">Showing {filteredBookings.length} of {bookings.length} bookings</p>
           </div>
           <div className="overflow-x-auto">
             {loading ? (
               <div className="flex justify-center items-center py-12">
-                <p className="text-white/75">Loading bookings...</p>
+                <p className="text-muted-foreground">Loading bookings...</p>
               </div>
             ) : filteredBookings.length === 0 ? (
               <div className="flex justify-center items-center py-12">
-                <p className="text-white/75">No bookings found</p>
+                <p className="text-muted-foreground">No bookings found</p>
               </div>
             ) : (
               <>
                 {/* Mobile list view */}
                 <div className="md:hidden p-4 space-y-4">
                   {filteredBookings.map((booking) => (
-                    <div key={booking.id} className="p-4 bg-slate-900/60 rounded-lg shadow-sm">
+                    <div key={booking.id} className="p-4 bg-muted/50 rounded-lg shadow-sm border border-border/30">
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className="font-medium text-white">{booking.customer_name}</p>
-                          <p className="text-white/70 text-xs">{booking.phone_number}</p>
-                          <p className="text-white/70 text-xs">{booking.email}</p>
+                          <p className="font-medium text-foreground">{booking.customer_name}</p>
+                          <p className="text-muted-foreground text-xs">{booking.phone_number}</p>
+                          <p className="text-muted-foreground text-xs">{booking.email}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-white/70 text-xs">{format(new Date(booking.booking_date), 'MMM dd')}</p>
-                          <p className="text-white/70 text-xs">{formatTimeTo12Hour(booking.start_time)} - {formatTimeTo12Hour(booking.end_time)}</p>
+                          <p className="text-muted-foreground text-xs">{format(new Date(booking.booking_date), 'MMM dd')}</p>
+                          <p className="text-muted-foreground text-xs">{formatTimeTo12Hour(booking.start_time)} - {formatTimeTo12Hour(booking.end_time)}</p>
                         </div>
                       </div>
                       <div className="mt-3 flex items-center justify-between">
@@ -297,7 +297,7 @@ export default function AdminDashboard() {
                               </Button>
                             </>
                           )}
-                          <Button size="sm" variant="ghost" onClick={() => handleDelete(booking.id)} disabled={actionLoading === booking.id} className="text-white/90">
+                          <Button size="sm" variant="ghost" onClick={() => handleDelete(booking.id)} disabled={actionLoading === booking.id} className="text-foreground/90">
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
@@ -309,37 +309,37 @@ export default function AdminDashboard() {
                 {/* Desktop / Tablet table view */}
                 <table className="w-full text-sm hidden md:table">
                   <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="text-left py-3 px-4 font-semibold text-white/90">Name</th>
-                      <th className="text-left py-3 px-4 font-semibold text-white/90">Contact</th>
-                      <th className="text-left py-3 px-4 font-semibold text-white/90">Date & Time</th>
-                      <th className="text-center py-3 px-4 font-semibold text-white/90">Courts</th>
-                      <th className="text-center py-3 px-4 font-semibold text-white/90">Status</th>
-                      <th className="text-right py-3 px-4 font-semibold text-white/90">Actions</th>
+                    <tr className="border-b border-border/30">
+                      <th className="text-left py-3 px-4 font-semibold text-foreground/90">Name</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground/90">Contact</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground/90">Date & Time</th>
+                      <th className="text-center py-3 px-4 font-semibold text-foreground/90">Courts</th>
+                      <th className="text-center py-3 px-4 font-semibold text-foreground/90">Status</th>
+                      <th className="text-right py-3 px-4 font-semibold text-foreground/90">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                       {filteredBookings.map((booking) => (
-                        <tr key={booking.id} className="border-b border-slate-700/30 hover:bg-slate-700/40 transition-colors">
+                        <tr key={booking.id} className="border-b border-border/30 hover:bg-muted/40 transition-colors">
                         <td className="py-4 px-4 align-top">
-                          <p className="font-medium text-white">{booking.customer_name}</p>
+                          <p className="font-medium text-foreground">{booking.customer_name}</p>
                         </td>
                         <td className="py-4 px-4 align-top">
-                          <p className="text-white/70 text-xs">{booking.phone_number}</p>
-                          <p className="text-white/70 text-xs">{booking.email}</p>
+                          <p className="text-muted-foreground text-xs">{booking.phone_number}</p>
+                          <p className="text-muted-foreground text-xs">{booking.email}</p>
                         </td>
                         <td className="py-4 px-4 align-top">
-                          <div className="flex items-center gap-2 text-white/70 text-xs mb-1">
+                          <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
                             <Calendar className="w-3 h-3" />
                             {format(new Date(booking.booking_date), 'MMM dd, yyyy')}
                           </div>
-                          <div className="flex items-center gap-2 text-white/70 text-xs">
+                          <div className="flex items-center gap-2 text-muted-foreground text-xs">
                             <Clock className="w-3 h-3" />
                             {formatTimeTo12Hour(booking.start_time)} - {formatTimeTo12Hour(booking.end_time)}
                           </div>
                         </td>
                         <td className="py-4 px-4 text-center align-top">
-                          <p className="font-medium text-white">{booking.number_of_courts}</p>
+                          <p className="font-medium text-foreground">{booking.number_of_courts}</p>
                         </td>
                         <td className="py-4 px-4 text-center align-top">{getStatusBadge(booking.status)}</td>
                         <td className="py-4 px-4 align-top">
@@ -369,7 +369,7 @@ export default function AdminDashboard() {
                               variant="ghost"
                               onClick={() => handleDelete(booking.id)}
                               disabled={actionLoading === booking.id}
-                              className="text-white/90"
+                              className="text-foreground/90"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
