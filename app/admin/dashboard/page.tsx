@@ -126,19 +126,19 @@ export default function AdminDashboard() {
     switch (status) {
       case 'pending':
         return (
-          <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full">
+          <span className="inline-flex items-center px-3 py-1 bg-yellow-600/10 text-yellow-300 text-xs font-semibold rounded-full ring-1 ring-yellow-600/10">
             Pending
           </span>
         )
       case 'approved':
         return (
-          <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+          <span className="inline-flex items-center px-3 py-1 bg-green-600/10 text-green-300 text-xs font-semibold rounded-full ring-1 ring-green-600/10">
             Approved
           </span>
         )
       case 'declined':
         return (
-          <span className="px-3 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full">
+          <span className="inline-flex items-center px-3 py-1 bg-red-600/10 text-red-300 text-xs font-semibold rounded-full ring-1 ring-red-600/10">
             Declined
           </span>
         )
@@ -155,22 +155,22 @@ export default function AdminDashboard() {
       <div className="absolute inset-0 bg-black/60" />
       <div className="relative z-10">
       {/* Header */}
-      <header className="border-b border-white/15 bg-black/35 backdrop-blur supports-backdrop-filter:bg-black/20 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+      <header className="sticky top-0 z-50 bg-slate-900/40 backdrop-blur-md border-b border-white/5">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
-            <p className="text-sm text-white/80">Manage court bookings</p>
+            <h1 className="text-2xl font-semibold text-white">Admin Dashboard</h1>
+            <p className="text-sm text-white/75">Manage court bookings</p>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/">
-              <Button variant="outline" size="sm">
-                <Home className="w-4 h-4 mr-2" />
-                Back to Booking
+              <Button variant="outline" size="sm" className="bg-white/90 text-slate-900 hover:bg-white">
+                <Home className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Back to Booking</span>
               </Button>
             </Link>
-            <Button onClick={handleLogout} variant="outline" size="sm" className="text-destructive">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
+            <Button onClick={handleLogout} size="sm" className="bg-red-600 text-white hover:bg-red-700">
+              <LogOut className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>
         </div>
@@ -178,42 +178,54 @@ export default function AdminDashboard() {
 
       <main className="container mx-auto px-4 py-8">
         {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card className="p-6 border border-white/15 bg-black/45 backdrop-blur-sm">
-            <p className="text-sm text-white/75 mb-2">Total Bookings</p>
-            <p className="text-3xl font-bold text-white">{stats.total}</p>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
+            <p className="text-sm text-white/85 mb-2">Total Bookings</p>
+            <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.total}</p>
           </Card>
-          <Card className="p-6 border border-white/15 bg-black/45 backdrop-blur-sm">
-            <p className="text-sm text-white/75 mb-2">Pending</p>
-            <p className="text-3xl font-bold text-yellow-700 dark:text-yellow-400">{stats.pending}</p>
+          <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
+            <p className="text-sm text-white/85 mb-2 flex items-center"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-yellow-400/90" />Pending</p>
+            <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.pending}</p>
           </Card>
-          <Card className="p-6 border border-white/15 bg-black/45 backdrop-blur-sm">
-            <p className="text-sm text-white/75 mb-2">Approved</p>
-            <p className="text-3xl font-bold text-green-700 dark:text-green-400">{stats.approved}</p>
+          <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
+            <p className="text-sm text-white/85 mb-2 flex items-center"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-emerald-400/90" />Approved</p>
+            <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.approved}</p>
           </Card>
-          <Card className="p-6 border border-white/15 bg-black/45 backdrop-blur-sm">
-            <p className="text-sm text-white/75 mb-2">Declined</p>
-            <p className="text-3xl font-bold text-red-700 dark:text-red-400">{stats.declined}</p>
+          <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
+            <p className="text-sm text-white/85 mb-2 flex items-center"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-rose-400/90" />Declined</p>
+            <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.declined}</p>
           </Card>
         </div>
 
         {/* Tab switcher */}
-        <div className="flex gap-2 mb-6">
-          <Button
-            variant={activeTab === 'bookings' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('bookings')}
-          >
-            Bookings
-          </Button>
-          <Button
-            variant={activeTab === 'courts' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('courts')}
-          >
-            Court Management
-          </Button>
-        </div>
+        <nav className="mb-6" role="tablist" aria-label="Admin sections">
+          <div className="inline-flex rounded-t-lg bg-slate-700/30 p-1">
+            <button
+              role="tab"
+              aria-selected={activeTab === 'bookings'}
+              onClick={() => setActiveTab('bookings')}
+              className={
+                (activeTab === 'bookings'
+                  ? 'px-4 py-2 text-sm font-medium rounded-t-md bg-white text-slate-900 -mb-px border-b-4 border-sky-500 shadow-sm'
+                  : 'px-4 py-2 text-sm text-white/80 hover:text-white')
+              }
+            >
+              Bookings
+            </button>
+            <button
+              role="tab"
+              aria-selected={activeTab === 'courts'}
+              onClick={() => setActiveTab('courts')}
+              className={
+                (activeTab === 'courts'
+                  ? 'px-4 py-2 text-sm font-medium rounded-t-md bg-white text-slate-900 -mb-px border-b-4 border-sky-500 shadow-sm'
+                  : 'px-4 py-2 text-sm text-white/80 hover:text-white')
+              }
+            >
+              Court Management
+            </button>
+          </div>
+        </nav>
 
         {activeTab === 'courts' ? (
           <CourtManagement />
@@ -241,8 +253,8 @@ export default function AdminDashboard() {
         </div>
 
         {/* Bookings Table */}
-        <Card className="border border-white/15 bg-black/45 backdrop-blur-sm">
-          <div className="p-6 border-b border-white/15">
+        <Card className="rounded-2xl bg-slate-800/80 overflow-hidden">
+          <div className="p-4 border-b border-slate-700/30 bg-transparent">
             <h2 className="text-lg font-semibold text-white">Bookings</h2>
             <p className="text-sm text-white/75">Showing {filteredBookings.length} of {bookings.length} bookings</p>
           </div>
@@ -256,77 +268,118 @@ export default function AdminDashboard() {
                 <p className="text-white/75">No bookings found</p>
               </div>
             ) : (
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/15 bg-black/30">
-                    <th className="text-left py-3 px-4 font-semibold text-white">Name</th>
-                    <th className="text-left py-3 px-4 font-semibold text-white">Contact</th>
-                    <th className="text-left py-3 px-4 font-semibold text-white">Date & Time</th>
-                    <th className="text-center py-3 px-4 font-semibold text-white">Courts</th>
-                    <th className="text-center py-3 px-4 font-semibold text-foreground">Status</th>
-                    <th className="text-right py-3 px-4 font-semibold text-foreground">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <>
+                {/* Mobile list view */}
+                <div className="md:hidden p-4 space-y-4">
                   {filteredBookings.map((booking) => (
-                    <tr key={booking.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                      <td className="py-4 px-4">
-                        <p className="font-medium text-foreground">{booking.customer_name}</p>
-                      </td>
-                      <td className="py-4 px-4">
-                        <p className="text-muted-foreground text-xs">{booking.phone_number}</p>
-                        <p className="text-muted-foreground text-xs">{booking.email}</p>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-                          <Calendar className="w-3 h-3" />
-                          {format(new Date(booking.booking_date), 'MMM dd, yyyy')}
+                    <div key={booking.id} className="p-4 bg-slate-900/60 rounded-lg shadow-sm">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-white">{booking.customer_name}</p>
+                          <p className="text-white/70 text-xs">{booking.phone_number}</p>
+                          <p className="text-white/70 text-xs">{booking.email}</p>
                         </div>
-                        <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                          <Clock className="w-3 h-3" />
-                          {formatTimeTo12Hour(booking.start_time)} - {formatTimeTo12Hour(booking.end_time)}
+                        <div className="text-right">
+                          <p className="text-white/70 text-xs">{format(new Date(booking.booking_date), 'MMM dd')}</p>
+                          <p className="text-white/70 text-xs">{formatTimeTo12Hour(booking.start_time)} - {formatTimeTo12Hour(booking.end_time)}</p>
                         </div>
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <p className="font-medium text-foreground">{booking.number_of_courts}</p>
-                      </td>
-                      <td className="py-4 px-4 text-center">{getStatusBadge(booking.status)}</td>
-                      <td className="py-4 px-4">
-                        <div className="flex justify-end gap-2">
+                      </div>
+                      <div className="mt-3 flex items-center justify-between">
+                        <div>{getStatusBadge(booking.status)}</div>
+                        <div className="flex items-center gap-2">
                           {booking.status === 'pending' && (
                             <>
-                              <Button
-                                size="sm"
-                                className="bg-green-600 hover:bg-green-700 text-white"
-                                onClick={() => handleApprove(booking.id)}
-                                disabled={actionLoading === booking.id}
-                              >
+                              <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 text-white" onClick={() => handleApprove(booking.id)} disabled={actionLoading === booking.id}>
                                 <Check className="w-4 h-4" />
                               </Button>
-                              <Button
-                                size="sm"
-                                className="bg-red-600 hover:bg-red-700 text-white"
-                                onClick={() => handleDecline(booking.id)}
-                                disabled={actionLoading === booking.id}
-                              >
+                              <Button size="sm" className="bg-rose-500 hover:bg-rose-600 text-white" onClick={() => handleDecline(booking.id)} disabled={actionLoading === booking.id}>
                                 <X className="w-4 h-4" />
                               </Button>
                             </>
                           )}
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDelete(booking.id)}
-                            disabled={actionLoading === booking.id}
-                          >
+                          <Button size="sm" variant="ghost" onClick={() => handleDelete(booking.id)} disabled={actionLoading === booking.id} className="text-white/90">
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
-                      </td>
-                    </tr>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
+                </div>
+
+                {/* Desktop / Tablet table view */}
+                <table className="w-full text-sm hidden md:table">
+                  <thead>
+                    <tr className="border-b border-white/10">
+                      <th className="text-left py-3 px-4 font-semibold text-white/90">Name</th>
+                      <th className="text-left py-3 px-4 font-semibold text-white/90">Contact</th>
+                      <th className="text-left py-3 px-4 font-semibold text-white/90">Date & Time</th>
+                      <th className="text-center py-3 px-4 font-semibold text-white/90">Courts</th>
+                      <th className="text-center py-3 px-4 font-semibold text-white/90">Status</th>
+                      <th className="text-right py-3 px-4 font-semibold text-white/90">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      {filteredBookings.map((booking) => (
+                        <tr key={booking.id} className="border-b border-slate-700/30 hover:bg-slate-700/40 transition-colors">
+                        <td className="py-4 px-4 align-top">
+                          <p className="font-medium text-white">{booking.customer_name}</p>
+                        </td>
+                        <td className="py-4 px-4 align-top">
+                          <p className="text-white/70 text-xs">{booking.phone_number}</p>
+                          <p className="text-white/70 text-xs">{booking.email}</p>
+                        </td>
+                        <td className="py-4 px-4 align-top">
+                          <div className="flex items-center gap-2 text-white/70 text-xs mb-1">
+                            <Calendar className="w-3 h-3" />
+                            {format(new Date(booking.booking_date), 'MMM dd, yyyy')}
+                          </div>
+                          <div className="flex items-center gap-2 text-white/70 text-xs">
+                            <Clock className="w-3 h-3" />
+                            {formatTimeTo12Hour(booking.start_time)} - {formatTimeTo12Hour(booking.end_time)}
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 text-center align-top">
+                          <p className="font-medium text-white">{booking.number_of_courts}</p>
+                        </td>
+                        <td className="py-4 px-4 text-center align-top">{getStatusBadge(booking.status)}</td>
+                        <td className="py-4 px-4 align-top">
+                          <div className="flex justify-end gap-2">
+                            {booking.status === 'pending' && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  className="bg-emerald-500 hover:bg-emerald-600 text-white"
+                                  onClick={() => handleApprove(booking.id)}
+                                  disabled={actionLoading === booking.id}
+                                >
+                                  <Check className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  className="bg-rose-500 hover:bg-rose-600 text-white"
+                                  onClick={() => handleDecline(booking.id)}
+                                  disabled={actionLoading === booking.id}
+                                >
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </>
+                            )}
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleDelete(booking.id)}
+                              disabled={actionLoading === booking.id}
+                              className="text-white/90"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
             )}
           </div>
         </Card>
