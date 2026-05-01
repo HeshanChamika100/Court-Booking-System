@@ -33,7 +33,7 @@ export type Booking = {
   start_time: string
   end_time: string
   number_of_courts: number
-  status: 'pending' | 'approved' | 'declined'
+  status: 'pending' | 'approved' | 'declined' | 'cancelled'
   created_at: string
 }
 
@@ -101,6 +101,35 @@ export async function updateBookingStatus(id: number, status: 'approved' | 'decl
 
   if (error) {
     console.error('[v0] Error updating booking:', error)
+    return null
+  }
+  return data as Booking
+}
+
+export async function getBookingsByEmail(email: string) {
+  const { data, error } = await supabaseAdmin
+    .from('bookings')
+    .select('*')
+    .eq('email', email)
+    .order('booking_date', { ascending: false })
+
+  if (error) {
+    console.error('[v0] Error fetching bookings by email:', error)
+    return []
+  }
+  return data as Booking[]
+}
+
+export async function cancelBooking(id: number) {
+  const { data, error } = await supabaseAdmin
+    .from('bookings')
+    .update({ status: 'cancelled' })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('[v0] Error cancelling booking:', error)
     return null
   }
   return data as Booking

@@ -14,7 +14,7 @@ import { formatTimeTo12Hour } from '@/lib/utils'
 export default function AdminDashboard() {
   const router = useRouter()
   const [bookings, setBookings] = useState<Booking[]>([])
-  const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'declined'>('all')
+  const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'declined' | 'cancelled'>('all')
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'tomorrow' | 'yesterday' | '7days' | '30days'>('all')
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<number | null>(null)
@@ -149,6 +149,7 @@ export default function AdminDashboard() {
     pending: bookings.filter((b) => b.status === 'pending').length,
     approved: bookings.filter((b) => b.status === 'approved').length,
     declined: bookings.filter((b) => b.status === 'declined').length,
+    cancelled: bookings.filter((b) => b.status === 'cancelled').length,
   }
 
   const getStatusBadge = (status: string) => {
@@ -171,6 +172,12 @@ export default function AdminDashboard() {
             Declined
           </span>
         )
+      case 'cancelled':
+        return (
+          <span className="inline-flex items-center px-3 py-1.5 bg-slate-400 text-slate-950 text-xs font-bold rounded-full">
+            Cancelled by user
+          </span>
+        )
       default:
         return null
     }
@@ -188,7 +195,7 @@ export default function AdminDashboard() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-background border border-border rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4">
             <div className="flex gap-3 mb-5">
-              <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-6 h-6 text-red-500 shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-foreground mb-1">Delete Booking?</p>
                 <p className="text-sm text-muted-foreground">
@@ -233,7 +240,7 @@ export default function AdminDashboard() {
 
       <main className="container mx-auto px-4 py-8">
         {/* Statistics */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-6 mb-8">
           <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
             <p className="text-sm text-white/85 mb-2">Total Bookings</p>
             <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.total}</p>
@@ -249,6 +256,10 @@ export default function AdminDashboard() {
           <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
             <p className="text-sm text-white/85 mb-2 flex items-center"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-rose-400/90" />Declined</p>
             <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.declined}</p>
+          </Card>
+          <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
+            <p className="text-sm text-white/85 mb-2 flex items-center"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-slate-400/90" />Cancelled</p>
+            <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.cancelled}</p>
           </Card>
         </div>
 
@@ -299,7 +310,7 @@ export default function AdminDashboard() {
           <div>
             <p className="text-sm font-medium text-accent mb-2">Status</p>
             <div className="flex gap-2 flex-wrap">
-              {(['all', 'pending', 'approved', 'declined'] as const).map((f) => (
+              {(['all', 'pending', 'approved', 'declined', 'cancelled'] as const).map((f) => (
                 <Button
                   key={f}
                   onClick={() => setFilter(f)}

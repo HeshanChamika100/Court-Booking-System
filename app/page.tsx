@@ -1,7 +1,7 @@
 import { BookingForm } from '@/components/booking-form'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { CalendarDays, Users, Trophy, Shield } from 'lucide-react'
+import { CalendarDays, Users, Trophy, Shield, X } from 'lucide-react'
 
 export const metadata = {
   title: 'Book Your Court - Wijaya Sports Club',
@@ -28,12 +28,21 @@ export default function Home() {
                 <p className="text-xs text-white/65">Padukka</p>
               </div>
             </div>
-            <Link href="/admin">
-              <Button variant="outline" size="sm" className="border-white/20 bg-white/90 text-slate-950 hover:bg-white">
-                <Shield className="mr-2 h-4 w-4" />
-                Admin Portal
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link href="/bookings/cancel">
+                <Button variant="outline" size="sm" className="border-white/20 bg-white/90 text-slate-950 hover:bg-white">
+                  <X className="mr-2 h-4 w-4" />
+                  <span className="hidden sm:inline">Cancel Booking</span>
+                  <span className="sm:hidden">Cancel</span>
+                </Button>
+              </Link>
+              <Link href="/admin">
+                <Button variant="outline" size="sm" className="border-white/20 bg-white/90 text-slate-950 hover:bg-white">
+                  <Shield className="mr-2 h-4 w-4" />
+                  Admin Portal
+                </Button>
+              </Link>
+            </div>
           </div>
         </header>
 

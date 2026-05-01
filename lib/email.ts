@@ -207,6 +207,80 @@ Wijaya Sports Club Team
   }
 }
 
+export function getCancellationEmail(
+  customerName: string,
+  bookingDate: string,
+  startTime: string,
+  endTime: string,
+  numberOfCourts: number
+): EmailTemplate {
+  return {
+    to: customerName,
+    subject: 'Booking Cancelled - Wijaya Sports Club',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+          <h1 style="margin: 0; font-size: 28px;">Wijaya Sports Club</h1>
+          <p style="margin: 10px 0 0 0;">Booking Cancelled</p>
+        </div>
+        
+        <div style="padding: 30px; background: white; border-radius: 0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <h2 style="color: #ff6b6b; margin-top: 0;">Booking Cancelled</h2>
+          
+          <p style="color: #666; line-height: 1.6;">
+            Dear ${customerName},
+          </p>
+          
+          <p style="color: #666; line-height: 1.6;">
+            Your booking has been successfully cancelled. The courts have been released and are now available for other customers to book.
+          </p>
+          
+          <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
+            <h3 style="margin-top: 0; color: #856404;">Cancelled Booking Details</h3>
+            <table style="width: 100%; color: #856404;">
+              <tr>
+                <td style="padding: 8px 0;"><strong>Date:</strong></td>
+                <td style="padding: 8px 0; text-align: right;">${bookingDate}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0;"><strong>Time:</strong></td>
+                <td style="padding: 8px 0; text-align: right;">${startTime} - ${endTime}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0;"><strong>Number of Courts:</strong></td>
+                <td style="padding: 8px 0; text-align: right;">${numberOfCourts}</td>
+              </tr>
+            </table>
+          </div>
+          
+          <p style="color: #666; line-height: 1.6;">
+            If you would like to book another time slot, please visit our website to make a new booking request.
+          </p>
+          
+          <p style="color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+            For any inquiries, please contact us at info@wijayasports.com
+          </p>
+        </div>
+      </div>
+    `,
+    text: `
+Dear ${customerName},
+
+Your booking has been successfully cancelled.
+
+Cancelled Booking Details:
+Date: ${bookingDate}
+Time: ${startTime} - ${endTime}
+Number of Courts: ${numberOfCourts}
+
+If you would like to book another time slot, please visit our website to make a new booking request.
+
+Best regards,
+Wijaya Sports Club Team
+    `,
+  }
+}
+
 // Send email function
 export async function sendEmail(to: string, subject: string, html: string, text: string) {
   try {
