@@ -4,6 +4,14 @@ import { useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { AlertCircle, CheckCircle, Clock, Users, Loader2, CalendarDays, ChevronRight } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -22,6 +30,13 @@ function formatTime(t: string) {
   const period = h >= 12 ? 'PM' : 'AM'
   const dh = h > 12 ? h - 12 : h === 0 ? 12 : h
   return `${dh}:00 ${period}`
+}
+
+function formatBookingDate(date: string) {
+  if (!date) return '-'
+  const parsed = new Date(`${date}T00:00:00`)
+  if (Number.isNaN(parsed.getTime())) return '-'
+  return format(parsed, 'EEEE, MMMM dd, yyyy')
 }
 
 function getSlotStyle(available: number, total: number, isSelected: boolean, isAdjacent: boolean) {
@@ -94,6 +109,7 @@ export function BookingForm() {
   const [numberOfCourts, setNumberOfCourts] = useState(1)
   const [formData, setFormData] = useState({ customer_name: '', phone_number: '', email: '' })
   const [submitting, setSubmitting] = useState(false)
+  const [showSummary, setShowSummary] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
   const [isClosed, setIsClosed] = useState(false)
@@ -202,11 +218,9 @@ export function BookingForm() {
     setError('')
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const validateAndOpenSummary = async () => {
     if (!selectedRange || !selectedDate || slots.length === 0) return
     setError('')
-    setSubmitting(true)
 
     // Re-fetch current availability before submitting - catch stale data early
     try {
@@ -223,7 +237,6 @@ export function BookingForm() {
         if (freshMin === 0) {
           setError('This slot is now fully booked. Please select a different time slot.')
           setSelectedRange(null)
-          setSubmitting(false)
           return
         }
 
@@ -232,13 +245,26 @@ export function BookingForm() {
             `Availability changed - only ${freshMin} court${freshMin !== 1 ? 's' : ''} remaining for this slot. Please reduce your selection.`
           )
           setNumberOfCourts(freshMin)
-          setSubmitting(false)
           return
         }
       }
     } catch {
       // If refresh fails, fall through - POST will validate server-side
     }
+
+    setShowSummary(true)
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    await validateAndOpenSummary()
+  }
+
+  const handleConfirmBooking = async () => {
+    if (!selectedRange || !selectedDate || slots.length === 0) return
+    setError('')
+    setSubmitting(true)
+    setShowSummary(false)
 
     const startSlot = slots[selectedRange.start]
     const endSlot = slots[selectedRange.end]
@@ -261,6 +287,7 @@ export function BookingForm() {
       if (!res.ok) throw new Error(data.message || 'Failed to create booking')
 
       setSuccess(true)
+      setError('')
       setSelectedDate(''); setSlots([]); setSelectedRange(null); setNumberOfCourts(1)
       setFormData({ customer_name: '', phone_number: '', email: '' })
       setTimeout(() => setSuccess(false), 8000)
@@ -276,6 +303,56 @@ export function BookingForm() {
 
   return (
     <div className="w-full max-w-2xl mx-auto">
+      <Dialog open={showSummary} onOpenChange={setShowSummary}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Review your booking</DialogTitle>
+            <DialogDescription>
+              Confirm these details before sending the request to the admin team.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 rounded-xl border border-border/60 bg-muted/30 p-4 text-sm">
+            <div className="flex items-start justify-between gap-4">
+              <span className="text-muted-foreground">Date</span>
+              <span className="font-medium text-right">{formatBookingDate(selectedDate)}</span>
+            </div>
+            <div className="flex items-start justify-between gap-4">
+              <span className="text-muted-foreground">Time</span>
+              <span className="font-medium text-right">
+                {selectedRange ? `${formatTime(slots[selectedRange.start].start_time)} – ${formatTime(slots[selectedRange.end].end_time)}` : '-'}
+              </span>
+            </div>
+            <div className="flex items-start justify-between gap-4">
+              <span className="text-muted-foreground">Courts</span>
+              <span className="font-medium text-right">{numberOfCourts}</span>
+            </div>
+            <div className="flex items-start justify-between gap-4">
+              <span className="text-muted-foreground">Name</span>
+              <span className="font-medium text-right">{formData.customer_name}</span>
+            </div>
+            <div className="flex items-start justify-between gap-4">
+              <span className="text-muted-foreground">Email</span>
+              <span className="font-medium text-right break-all">{formData.email}</span>
+            </div>
+            <div className="flex items-start justify-between gap-4">
+              <span className="text-muted-foreground">Phone</span>
+              <span className="font-medium text-right">{formData.phone_number}</span>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSummary(false)} disabled={submitting}>
+              Back
+            </Button>
+            <Button onClick={handleConfirmBooking} disabled={submitting} className="gap-2">
+              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {submitting ? 'Submitting…' : 'Request booking'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Card className="border border-white/20 bg-white/92 p-6 shadow-2xl shadow-black/20 ring-1 ring-white/30 backdrop-blur-2xl md:p-8">
         <div className="mb-6 text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-slate-950">Book Your Court</h2>
@@ -317,7 +394,7 @@ export function BookingForm() {
             />
             {selectedDate && (
               <p className="mt-1.5 text-xs text-muted-foreground pl-1">
-                {format(new Date(selectedDate + 'T00:00:00'), 'EEEE, MMMM dd, yyyy')}
+                {formatBookingDate(selectedDate)}
               </p>
             )}
           </div>
@@ -419,7 +496,7 @@ export function BookingForm() {
                     <span className="ml-1.5 text-xs font-normal text-muted-foreground">({durationHours} hr{durationHours > 1 ? 's' : ''})</span>
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {format(new Date(selectedDate + 'T00:00:00'), 'EEEE, MMMM dd, yyyy')}
+                    {formatBookingDate(selectedDate)}
                   </p>
                 </div>
                 <button type="button" onClick={() => { setSelectedRange(null); setError('') }} className="text-xs text-primary hover:underline shrink-0">
@@ -503,7 +580,7 @@ export function BookingForm() {
                 {/* Booking summary */}
                 <div className="p-4 bg-muted/40 border border-border/50 rounded-xl text-sm space-y-1.5">
                   <p className="font-semibold text-foreground mb-2">📋 Booking Summary</p>
-                  <p className="text-muted-foreground">📅 {format(new Date(selectedDate + 'T00:00:00'), 'EEEE, MMMM dd, yyyy')}</p>
+                  <p className="text-muted-foreground">📅 {formatBookingDate(selectedDate)}</p>
                   <p className="text-muted-foreground">🕐 {formatTime(slots[selectedRange.start].start_time)} – {formatTime(slots[selectedRange.end].end_time)} ({durationHours} hr{durationHours > 1 ? 's' : ''})</p>
                   <p className="text-muted-foreground">🏸 {numberOfCourts} Court{numberOfCourts !== 1 ? 's' : ''}</p>
                 </div>
