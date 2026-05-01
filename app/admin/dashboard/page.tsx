@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Check, X, Trash2, LogOut, Calendar, Clock, Home, AlertCircle } from 'lucide-react'
-import { format, startOfToday, endOfToday, startOfTomorrow, endOfTomorrow, subDays, addDays, startOfDay, endOfDay } from 'date-fns'
+import { format, startOfToday, endOfToday, startOfTomorrow, endOfTomorrow, subDays, addDays, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns'
 import { type Booking } from '@/lib/supabase'
 import { CourtManagement } from '@/components/court-management'
 import { formatTimeTo12Hour } from '@/lib/utils'
@@ -15,7 +15,7 @@ export default function AdminDashboard() {
   const router = useRouter()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'declined' | 'cancelled'>('all')
-  const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'tomorrow' | 'yesterday' | '7days' | '30days'>('all')
+  const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'tomorrow' | 'yesterday' | 'week' | 'month'>('all')
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<number | null>(null)
   const [actionError, setActionError] = useState('')
@@ -126,12 +126,10 @@ export default function AdminDashboard() {
       case 'yesterday':
         const yesterday = subDays(new Date(), 1)
         return bookDate >= startOfDay(yesterday) && bookDate <= endOfDay(yesterday)
-      case '7days':
-        const next7Days = addDays(today, 7)
-        return bookDate >= startOfToday() && bookDate <= endOfDay(next7Days)
-      case '30days':
-        const next30Days = addDays(today, 30)
-        return bookDate >= startOfToday() && bookDate <= endOfDay(next30Days)
+      case 'week':
+        return bookDate >= startOfWeek(today) && bookDate <= endOfWeek(today)
+      case 'month':
+        return bookDate >= startOfMonth(today) && bookDate <= endOfMonth(today)
       case 'all':
       default:
         return true
@@ -327,13 +325,13 @@ export default function AdminDashboard() {
           <div>
             <p className="text-sm font-medium text-accent mb-2">Date Range</p>
             <div className="flex gap-2 flex-wrap">
-              {(['all', 'today', 'tomorrow', 'yesterday', '7days', '30days'] as const).map((d) => {
+              {(['all', 'today', 'tomorrow', 'yesterday', 'week', 'month'] as const).map((d) => {
                 let label = d.charAt(0).toUpperCase() + d.slice(1)
                 if (d === 'today') label = `Today (${format(new Date(), 'MMM d')})`
                 else if (d === 'tomorrow') label = `Tomorrow (${format(addDays(new Date(), 1), 'MMM d')})`
                 else if (d === 'yesterday') label = `Yesterday (${format(subDays(new Date(), 1), 'MMM d')})`
-                else if (d === '7days') label = 'Next 7 Days'
-                else if (d === '30days') label = 'Next 30 Days'
+                else if (d === 'week') label = 'This Week'
+                else if (d === 'month') label = 'This Month'
 
                 return (
                   <Button

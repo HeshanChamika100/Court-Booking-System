@@ -92,7 +92,7 @@ export default function Home() {
                   </li>
                   <li className="flex gap-3">
                     <span className="text-emerald-300 font-bold flex-shrink-0">✓</span>
-                    <span>Maximum 6 courts per booking session</span>
+                    <span>Maximum 6 courts per booking session (according to availability)</span>
                   </li>
                   <li className="flex gap-3">
                     <span className="text-emerald-300 font-bold flex-shrink-0">✓</span>
