@@ -271,7 +271,7 @@ export default function AdminDashboard() {
         <div className="space-y-3 mb-6">
           {/* Status Filter */}
           <div>
-            <p className="text-sm font-medium text-muted-foreground mb-2">Status</p>
+            <p className="text-sm font-medium text-accent mb-2">Status</p>
             <div className="flex gap-2 flex-wrap">
               {(['all', 'pending', 'approved', 'declined'] as const).map((f) => (
                 <Button
@@ -288,7 +288,7 @@ export default function AdminDashboard() {
 
           {/* Date Filter */}
           <div>
-            <p className="text-sm font-medium text-muted-foreground mb-2">Date Range</p>
+            <p className="text-sm font-medium text-accent mb-2">Date Range</p>
             <div className="flex gap-2 flex-wrap">
               {(['all', 'today', 'tomorrow', 'yesterday', '7days', '30days'] as const).map((d) => {
                 let label = d.charAt(0).toUpperCase() + d.slice(1)
