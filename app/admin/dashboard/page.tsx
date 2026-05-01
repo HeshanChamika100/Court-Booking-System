@@ -20,6 +20,7 @@ export default function AdminDashboard() {
   const [actionLoading, setActionLoading] = useState<number | null>(null)
   const [actionError, setActionError] = useState('')
   const [activeTab, setActiveTab] = useState<'bookings' | 'courts'>('bookings')
+  const [deleteConfirm, setDeleteConfirm] = useState<Booking | null>(null)
 
   useEffect(() => {
     const token = localStorage.getItem('admin_token')
@@ -90,21 +91,20 @@ export default function AdminDashboard() {
   }
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Are you sure you want to delete this booking?')) {
-      setActionLoading(id)
-      try {
-        const res = await fetch(`/api/bookings/${id}`, { method: 'DELETE' })
-        const data = await res.json()
-        if (data.success) {
-          setBookings((prev) => prev.filter((b) => b.id !== id))
-        } else {
-          console.error('[v0] Error deleting booking:', data.message)
-        }
-      } catch (err) {
-        console.error('[v0] Error deleting booking:', err)
-      } finally {
-        setActionLoading(null)
+    setActionLoading(id)
+    try {
+      const res = await fetch(`/api/bookings/${id}`, { method: 'DELETE' })
+      const data = await res.json()
+      if (data.success) {
+        setBookings((prev) => prev.filter((b) => b.id !== id))
+        setDeleteConfirm(null)
+      } else {
+        console.error('[v0] Error deleting booking:', data.message)
       }
+    } catch (err) {
+      console.error('[v0] Error deleting booking:', err)
+    } finally {
+      setActionLoading(null)
     }
   }
 
@@ -183,6 +183,32 @@ export default function AdminDashboard() {
     >
       <div className="absolute inset-0 bg-black/60" />
       <div className="relative z-10">
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-background border border-border rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4">
+            <div className="flex gap-3 mb-5">
+              <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-foreground mb-1">Delete Booking?</p>
+                <p className="text-sm text-muted-foreground">
+                  Are you sure you want to delete the booking for <span className="font-medium">{deleteConfirm.customer_name}</span> on <span className="font-medium">{format(new Date(deleteConfirm.booking_date), 'MMM d, yyyy')}</span>? This action cannot be undone.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <Button variant="outline" onClick={() => setDeleteConfirm(null)}>Cancel</Button>
+              <Button
+                className="bg-red-600 hover:bg-red-700 text-white"
+                onClick={() => deleteConfirm && handleDelete(deleteConfirm.id)}
+                disabled={actionLoading === deleteConfirm.id}
+              >
+                {actionLoading === deleteConfirm.id ? 'Deleting...' : 'Delete Booking'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <header className="sticky top-0 z-50 bg-slate-900/40 backdrop-blur-md border-b border-white/5">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -358,7 +384,7 @@ export default function AdminDashboard() {
                               </Button>
                             </>
                           )}
-                          <Button size="sm" variant="ghost" onClick={() => handleDelete(booking.id)} disabled={actionLoading === booking.id} className="text-foreground/90">
+                          <Button size="sm" variant="ghost" onClick={() => setDeleteConfirm(booking)} disabled={actionLoading === booking.id} className="text-foreground/90">
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
@@ -428,7 +454,7 @@ export default function AdminDashboard() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => handleDelete(booking.id)}
+                              onClick={() => setDeleteConfirm(booking)}
                               disabled={actionLoading === booking.id}
                               className="text-foreground/90"
                             >
