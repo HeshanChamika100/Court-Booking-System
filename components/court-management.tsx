@@ -179,7 +179,7 @@ function CourtsSection() {
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-            className="bg-background border-input"
+            className="bg-background border-input text-foreground placeholder-muted-foreground"
           />
           <Button onClick={handleAdd} disabled={adding || !newName.trim()} className="flex-shrink-0">
             {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
@@ -199,7 +199,7 @@ function CourtsSection() {
                 key={court.id}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${court.is_active
                     ? 'bg-emerald-500/8 border-emerald-500/30'
-                    : 'bg-muted/40 border-border/40 opacity-70'
+                    : 'bg-muted/50 border-border opacity-80'
                   }`}
               >
                 {/* Status dot */}
@@ -215,12 +215,12 @@ function CourtsSection() {
                       if (e.key === 'Enter') handleRename(court.id)
                       if (e.key === 'Escape') cancelEdit()
                     }}
-                    className="flex-1 px-2 py-0.5 rounded-md border border-primary/60 bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 min-w-0"
+                    className="flex-1 px-2 py-0.5 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-sky-500/30 min-w-0"
                   />
                 ) : (
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <span className="font-medium text-sm text-foreground truncate">{court.name}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${court.is_active ? 'bg-emerald-500/15 text-emerald-600' : 'bg-muted text-muted-foreground'
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${court.is_active ? 'bg-emerald-500/15 text-emerald-700' : 'bg-muted text-muted-foreground'
                       }`}>
                       {court.is_active ? 'Active' : 'Inactive'}
                     </span>
