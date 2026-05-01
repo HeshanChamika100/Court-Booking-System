@@ -95,7 +95,7 @@ export default function Home() {
               </div>
             </div>
             <div className="border-t border-white/10 pt-6 text-center text-xs text-white/60">
-              <p>&copy; 2024 Wijaya Sports Club. All rights reserved.</p>
+              <p>&copy; {new Date().getFullYear()} Wijaya Sports Club. All rights reserved.</p>
             </div>
           </div>
         </footer>
