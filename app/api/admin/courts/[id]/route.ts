@@ -1,45 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { toggleCourtActive, renameCourt, deleteCourt } from '@/lib/supabase'
+import { deleteCourt } from '@/lib/supabase'
 import { isAdminRequestAuthorized } from '@/lib/admin-session'
-
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  if (!isAdminRequestAuthorized(request)) {
-    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
-  }
-
-  try {
-    const { id } = await params
-    const body = await request.json()
-
-    // Rename
-    if (body.name !== undefined) {
-      if (!body.name.trim()) {
-        return NextResponse.json({ success: false, message: 'Name cannot be empty' }, { status: 400 })
-      }
-      const court = await renameCourt(parseInt(id), body.name.trim())
-      if (!court) {
-        return NextResponse.json({ success: false, message: 'Failed to rename court' }, { status: 500 })
-      }
-      return NextResponse.json({ success: true, data: court })
-    }
-
-    // Toggle active
-    if (body.is_active !== undefined) {
-      const court = await toggleCourtActive(parseInt(id), body.is_active)
-      if (!court) {
-        return NextResponse.json({ success: false, message: 'Failed to update court' }, { status: 500 })
-      }
-      return NextResponse.json({ success: true, data: court })
-    }
-
-    return NextResponse.json({ success: false, message: 'Nothing to update' }, { status: 400 })
-  } catch {
-    return NextResponse.json({ success: false, message: 'Failed to update court' }, { status: 500 })
-  }
-}
 
 export async function DELETE(
   _request: NextRequest,
