@@ -39,30 +39,57 @@ export default function Home() {
 
         <main className="container mx-auto px-4 py-8 md:py-12 lg:py-16">
           <div className="grid gap-8 lg:gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-            <section className="max-w-2xl pt-0 md:pt-4 lg:sticky lg:top-28">
-              <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight tracking-tight text-white">
-                Book badminton courts without the clutter.
-              </h2>
-              <p className="mt-4 md:mt-6 text-sm md:text-base lg:text-lg leading-6 md:leading-7 text-white/78">
-                Reserve your slot at Wijaya Sports Club with a clean, fast booking flow and live court availability.
-              </p>
+            <section className="max-w-2xl pt-0 md:pt-4 lg:sticky lg:top-28 space-y-8">
+              <div>
+                <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight tracking-tight text-white">
+                  Book badminton courts without the clutter.
+                </h2>
+                <p className="mt-4 md:mt-6 text-sm md:text-base lg:text-lg leading-6 md:leading-7 text-white/78">
+                  Reserve your slot at Wijaya Sports Club with a clean, fast booking flow and live court availability.
+                </p>
 
-              <div className="mt-6 md:mt-8 grid gap-3 grid-cols-2 sm:grid-cols-3">
-                <div className="rounded-xl md:rounded-2xl border border-white/12 bg-black/28 p-3 md:p-4 backdrop-blur-md">
-                  <CalendarDays className="mb-2 md:mb-3 h-4 md:h-5 w-4 md:w-5 text-emerald-300" />
-                  <p className="text-xs md:text-sm font-semibold text-white">Flexible</p>
-                  <p className="mt-1 text-xs leading-4 text-white/68">Pick any date from today onward.</p>
+                <div className="mt-6 md:mt-8 grid gap-3 grid-cols-2 sm:grid-cols-3">
+                  <div className="rounded-xl md:rounded-2xl border border-white/12 bg-black/28 p-3 md:p-4 backdrop-blur-md">
+                    <CalendarDays className="mb-2 md:mb-3 h-4 md:h-5 w-4 md:w-5 text-emerald-300" />
+                    <p className="text-xs md:text-sm font-semibold text-white">Flexible</p>
+                    <p className="mt-1 text-xs leading-4 text-white/68">Pick any date from today onward.</p>
+                  </div>
+                  <div className="rounded-xl md:rounded-2xl border border-white/12 bg-black/28 p-3 md:p-4 backdrop-blur-md">
+                    <Users className="mb-2 md:mb-3 h-4 md:h-5 w-4 md:w-5 text-sky-300" />
+                    <p className="text-xs md:text-sm font-semibold text-white">Group ready</p>
+                    <p className="mt-1 text-xs leading-4 text-white/68">Reserve multiple courts in one request.</p>
+                  </div>
+                  <div className="rounded-xl md:rounded-2xl border border-white/12 bg-black/28 p-3 md:p-4 backdrop-blur-md">
+                    <Shield className="mb-2 md:mb-3 h-4 md:h-5 w-4 md:w-5 text-amber-300" />
+                    <p className="text-xs md:text-sm font-semibold text-white">Reliable</p>
+                    <p className="mt-1 text-xs leading-4 text-white/68">Availability updates before you submit.</p>
+                  </div>
                 </div>
-                <div className="rounded-xl md:rounded-2xl border border-white/12 bg-black/28 p-3 md:p-4 backdrop-blur-md">
-                  <Users className="mb-2 md:mb-3 h-4 md:h-5 w-4 md:w-5 text-sky-300" />
-                  <p className="text-xs md:text-sm font-semibold text-white">Group ready</p>
-                  <p className="mt-1 text-xs leading-4 text-white/68">Reserve multiple courts in one request.</p>
-                </div>
-                <div className="rounded-xl md:rounded-2xl border border-white/12 bg-black/28 p-3 md:p-4 backdrop-blur-md">
-                  <Shield className="mb-2 md:mb-3 h-4 md:h-5 w-4 md:w-5 text-amber-300" />
-                  <p className="text-xs md:text-sm font-semibold text-white">Reliable</p>
-                  <p className="mt-1 text-xs leading-4 text-white/68">Availability updates before you submit.</p>
-                </div>
+              </div>
+
+              {/* Rules & Regulations */}
+              <div className="rounded-2xl border border-white/12 bg-black/28 p-4 md:p-6 backdrop-blur-md">
+                <h3 className="text-lg md:text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <span className="text-amber-300">📋</span> Rules & Regulations
+                </h3>
+                <ul className="space-y-3 text-sm text-white/80">
+                  <li className="flex gap-3">
+                    <span className="text-emerald-300 font-bold flex-shrink-0">✓</span>
+                    <span>Bookings must be made at least 2 hours in advance</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-emerald-300 font-bold flex-shrink-0">✓</span>
+                    <span>Cancellation allowed up to 1 hour before booking time</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-emerald-300 font-bold flex-shrink-0">✓</span>
+                    <span>Maximum 6 courts per booking session</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-emerald-300 font-bold flex-shrink-0">✓</span>
+                    <span>Follow club code of conduct and facility guidelines</span>
+                  </li>
+                </ul>
               </div>
             </section>
 
