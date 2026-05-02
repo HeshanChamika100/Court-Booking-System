@@ -75,7 +75,7 @@ function generateConfirmationEmail(
   return `
 Dear ${name},
 
-Thank you for submitting your court booking request at Badminton Club - Padukka.
+Thank you for submitting your court booking request at Badminton Club - Colombo.
 
 Booking Details:
 - Date: ${date}
@@ -108,7 +108,7 @@ Booking Confirmed:
 
 Please arrive 10 minutes before your scheduled time. If you need to make any changes, please contact us as soon as possible.
 
-Thank you for choosing Badminton Club - Padukka!
+Thank you for choosing Badminton Club - Colombo!
 
 Best regards,
 Badminton Club Admin Team
@@ -119,7 +119,7 @@ function generateDeclineEmail(name: string): string {
   return `
 Dear ${name},
 
-Thank you for your interest in booking courts at Badminton Club - Padukka.
+Thank you for your interest in booking courts at Badminton Club - Colombo.
 
 Unfortunately, your booking request has been DECLINED. This may be due to:
 - The requested time slot is not available

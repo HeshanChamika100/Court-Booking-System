@@ -8,7 +8,7 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: 'Badminton Club - Court Booking System',
-  description: 'Book badminton courts at Badminton Club, Padukka',
+  description: 'Book badminton courts at Badminton Club, Colombo',
   generator: 'v0.app',
   icons: {
     icon: [

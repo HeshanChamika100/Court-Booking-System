@@ -1,6 +1,6 @@
 # Badminton Club - Court Booking System
 
-A modern, full-featured court booking system for Badminton Club in Padukka, built with Next.js 16, Supabase, and TypeScript.
+A modern, full-featured court booking system for Badminton Club in Colombo, built with Next.js 16, Supabase, and TypeScript.
 
 Live site: [https://bminton-court-booking-system.vercel.app/](https://bminton-court-booking-system.vercel.app/)
 
@@ -317,7 +317,7 @@ For issues or questions, contact the development team.
 
 ## License
 
-Proprietary - Badminton Club, Padukka
+Proprietary - Badminton Club, Colombo
 
 ## Changelog
 

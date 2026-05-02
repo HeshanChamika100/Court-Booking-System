@@ -150,7 +150,7 @@ export default function CancelBookingPage() {
               </div>
               <div>
                 <h1 className="text-lg font-semibold tracking-tight text-white md:text-xl">Badminton Club</h1>
-                <p className="text-xs text-white/65">Padukka</p>
+                <p className="text-xs text-white/65">Colombo</p>
               </div>
             </div>
             <Link href="/">

@@ -5,7 +5,7 @@ import { CalendarDays, Users, Trophy, Shield, X } from 'lucide-react'
 
 export const metadata = {
   title: 'Book Your Court - Badminton Club',
-  description: 'Book badminton courts at Badminton Club, Padukka. Easy online booking system.',
+  description: 'Book badminton courts at Badminton Club, Colombo. Easy online booking system.',
 }
 
 export default function Home() {
@@ -25,7 +25,7 @@ export default function Home() {
               </div>
               <div>
                 <h1 className="text-lg font-semibold tracking-tight text-white md:text-xl">Badminton Club</h1>
-                <p className="text-xs text-white/65">Padukka</p>
+                <p className="text-xs text-white/65">Colombo</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -113,7 +113,7 @@ export default function Home() {
             <div className="grid gap-6 sm:grid-cols-3 mb-6">
               <div>
                 <p className="font-semibold text-white">Badminton Club</p>
-                <p className="text-sm text-white/70">Padukka, Sri Lanka</p>
+                <p className="text-sm text-white/70">Colombo, Sri Lanka</p>
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-white/60 mb-2">Contact</p>
