@@ -278,24 +278,24 @@ export default function AdminDashboard() {
 
       <main className="container mx-auto px-4 py-8">
         {/* Statistics */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-6 mb-8">
-          <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
+        <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 snap-x snap-mandatory sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 md:grid-cols-5 mb-8">
+          <Card className="min-w-[64%] snap-start p-4 sm:min-w-0 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
             <p className="text-sm text-white/85 mb-2">Total Bookings</p>
             <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.total}</p>
           </Card>
-          <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
+          <Card className="min-w-[64%] snap-start p-4 sm:min-w-0 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
             <p className="text-sm text-white/85 mb-2 flex items-center"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-yellow-400/90" />Pending</p>
             <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.pending}</p>
           </Card>
-          <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
+          <Card className="min-w-[64%] snap-start p-4 sm:min-w-0 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
             <p className="text-sm text-white/85 mb-2 flex items-center"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-emerald-400/90" />Approved</p>
             <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.approved}</p>
           </Card>
-          <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
+          <Card className="min-w-[64%] snap-start p-4 sm:min-w-0 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
             <p className="text-sm text-white/85 mb-2 flex items-center"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-rose-400/90" />Declined</p>
             <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.declined}</p>
           </Card>
-          <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
+          <Card className="min-w-[64%] snap-start p-4 sm:min-w-0 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
             <p className="text-sm text-white/85 mb-2 flex items-center"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-slate-400/90" />Cancelled</p>
             <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.cancelled}</p>
           </Card>

@@ -145,23 +145,23 @@ function CourtsSection() {
             <Loader2 className="w-6 h-6 text-primary animate-spin" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+          <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 mb-4">
             {courts.map((court, idx) => (
               <div
                 key={court.id}
-                className="flex flex-col items-center justify-center p-4 rounded-lg border-2 border-dashed border-border bg-gradient-to-br from-primary/5 to-primary/10 hover:border-primary/50 hover:bg-primary/15 transition-all group relative"
+                className="flex flex-col items-center justify-center p-2 sm:p-4 rounded-lg border-2 border-dashed border-border bg-gradient-to-br from-primary/5 to-primary/10 hover:border-primary/50 hover:bg-primary/15 transition-all group relative"
               >
-                <span className="text-2xl font-bold text-primary">{idx + 1}</span>
-                <span className="text-xs text-muted-foreground mt-1 font-medium">Court</span>
+                <span className="text-base sm:text-2xl font-bold text-primary leading-none">{idx + 1}</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground mt-1 font-medium leading-none">Court</span>
                 <button
                   onClick={() => setDeleteConfirm(court)}
                   disabled={deletingId === court.id}
-                  className="absolute top-1 right-1 p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
+                  className="absolute top-1 right-1 p-0.5 sm:p-1 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
                   title="Remove court"
                 >
                   {deletingId === court.id
-                    ? <Loader2 className="w-4 h-4 animate-spin" />
-                    : <Trash2 className="w-4 h-4" />
+                    ? <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                    : <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                   }
                 </button>
               </div>
