@@ -7,6 +7,7 @@ A modern, full-featured court booking system for Wijaya Sports Club in Padukka, 
 - **Public Booking Portal**: Customers can easily book badminton courts with real-time availability checking
 - **Admin Dashboard**: Manage bookings, approve/decline requests, and track booking statistics
 - **Email Notifications**: Automated email confirmations, approvals, and decline notifications
+- **WhatsApp Notifications**: Approval alerts sent to the booking phone number when WhatsApp is configured
 - **Supabase Integration**: Secure database with Row Level Security (RLS) policies
 - **Responsive Design**: Beautiful, mobile-first UI with premium styling
 - **Real-time Availability**: Check court availability before booking
@@ -18,6 +19,7 @@ A modern, full-featured court booking system for Wijaya Sports Club in Padukka, 
 - **Frontend**: Next.js 16, React, TypeScript, Tailwind CSS, shadcn/ui
 - **Backend**: Next.js API Routes, Supabase PostgreSQL
 - **Email**: Nodemailer (SMTP) or Resend
+- **Messaging**: Twilio WhatsApp API
 - **Deployment**: Vercel
 
 ## Project Structure
@@ -91,41 +93,26 @@ CREATE TABLE bookings (
 CREATE TYPE booking_status AS ENUM ('pending', 'approved', 'declined');
 ```
 
-Default courts (Court 1-6) have been pre-inserted into the database.
-
-### 3. Environment Variables
-
-Create a `.env.local` file in the root directory:
-
-```env
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-# Email Configuration (SMTP)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your_email@gmail.com
-SMTP_PASSWORD=your_app_password
-SMTP_FROM_EMAIL=noreply@wijayasports.com
-
-# Admin Settings
-NEXT_PUBLIC_ADMIN_PASSWORD=admin123
-ADMIN_EMAIL=admin@wijayasports.com
-
-# App Settings
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+**Admin Password Settings Table**
+```sql
+CREATE TABLE admin_settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
 ```
 
-### 4. Install Dependencies
+The admin password reset flow stores the active password hash in this table under the `admin_password_hash` key.
+
+Default courts (Court 1-6) have been pre-inserted into the database.
+### 3. Install Dependencies
 
 ```bash
 pnpm install
 # or npm install / yarn install
 ```
 
-### 5. Run Development Server
+### 4. Run Development Server
 
 ```bash
 pnpm dev
@@ -148,7 +135,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ### For Admins
 
 1. **Go to** `/admin`
-2. **Login** with password: `admin123`
+2. **Login** with the password configured in `ADMIN_PASSWORD`
 3. **Dashboard features**:
    - View all bookings and statistics
    - Filter by status (All, Pending, Approved, Declined)
@@ -176,6 +163,20 @@ SMTP_PORT=587
 SMTP_USER=apikey
 SMTP_PASSWORD=SG.xxxxxxxxxxxxxxxxxxxxx
 ```
+
+### Using WhatsApp Notifications
+
+When a booking is approved, the system can send a WhatsApp message to the phone number stored with the booking.
+
+Configure Twilio WhatsApp credentials:
+
+```env
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+```
+
+The booking phone number should be entered in local mobile format like `07XXXXXXXX`. The server normalizes Sri Lankan numbers to WhatsApp E.164 format before sending.
 
 ## API Documentation
 
@@ -239,7 +240,9 @@ The system calculates available slots based on:
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM_EMAIL`
-- `NEXT_PUBLIC_ADMIN_PASSWORD`
+- `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`
+- `ADMIN_PASSWORD`
+- `ADMIN_SESSION_SECRET`
 - `ADMIN_EMAIL`
 - `NEXT_PUBLIC_APP_URL`
 
@@ -247,7 +250,8 @@ The system calculates available slots based on:
 
 ### Change Admin Password
 ```env
-NEXT_PUBLIC_ADMIN_PASSWORD=your_new_password
+ADMIN_PASSWORD=your_new_password
+ADMIN_SESSION_SECRET=generate_a_random_long_secret
 ```
 
 ### Modify Operating Hours
@@ -272,9 +276,14 @@ Edit `lib/email.ts` to modify email content, subject lines, and HTML templates.
 - Verify tables exist in Supabase
 
 ### Admin Login Not Working
-- Clear browser localStorage (DevTools > Application > Local Storage)
+- Clear browser cookies for the site
 - Verify password matches exactly
-- Check `NEXT_PUBLIC_ADMIN_PASSWORD` environment variable
+- Check `ADMIN_PASSWORD` and `ADMIN_SESSION_SECRET` environment variables
+
+### Password Reset Not Working
+- Verify the `admin_settings` table exists in Supabase
+- Check `ADMIN_EMAIL` matches the inbox that receives reset links
+- Confirm `NEXT_PUBLIC_APP_URL` points to the correct site URL
 
 ## Browser Support
 

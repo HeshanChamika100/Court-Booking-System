@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createBooking, getBookings, isRangeAvailable, VALID_SLOT_STARTS, VALID_SLOT_ENDS } from '@/lib/supabase'
+import { createBooking, getBookings, isRangeAvailable, isValidSlotForDate, getEffectiveOverride } from '@/lib/supabase'
 import { getBookingConfirmationEmail, sendEmail } from '@/lib/email'
 import { format } from 'date-fns'
+import { formatTimeWithoutSeconds } from '@/lib/utils'
+import { isAdminRequestAuthorized } from '@/lib/admin-session'
 
 export async function GET(request: NextRequest) {
+  if (!isAdminRequestAuthorized(request)) {
+    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const bookings = await getBookings()
     return NextResponse.json({ success: true, data: bookings }, { status: 200 })
@@ -29,12 +35,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate slot is within operating hours (4 PM – 10 PM), spanning 1 or more 1-hour blocks
-    const slotStartIdx = VALID_SLOT_STARTS.indexOf(start_time)
-    const slotEndIdx   = VALID_SLOT_ENDS.indexOf(end_time)
-    if (slotStartIdx === -1 || slotEndIdx === -1 || slotStartIdx > slotEndIdx) {
+    // Reject bookings on closed dates
+    const override = await getEffectiveOverride(booking_date)
+    if (override?.is_closed) {
       return NextResponse.json(
-        { success: false, message: 'Invalid time slot. Bookings must be between 4 PM and 10 PM.' },
+        { success: false, message: 'Bookings are not available on this date.' },
+        { status: 400 }
+      )
+    }
+
+    // Validate slot is within this date's operating hours (respects custom-hour overrides)
+    const validSlot = await isValidSlotForDate(booking_date, start_time, end_time)
+    if (!validSlot) {
+      return NextResponse.json(
+        { success: false, message: 'Invalid time slot for this date.' },
         { status: 400 }
       )
     }
@@ -78,8 +92,8 @@ export async function POST(request: NextRequest) {
     const confirmationEmail = getBookingConfirmationEmail(
       customer_name,
       format(new Date(booking_date), 'MMMM dd, yyyy'),
-      start_time,
-      end_time,
+      formatTimeWithoutSeconds(start_time),
+      formatTimeWithoutSeconds(end_time),
       number_of_courts
     )
 
