@@ -390,7 +390,7 @@ export default function AdminDashboard() {
 
         {/* Bookings Table */}
         <Card className="rounded-2xl bg-white overflow-hidden border border-border/50">
-          <div className="p-4 border-b border-border/30 bg-white">
+          <div className="p-4 bg-white drop-shadow-2xl">
             <h2 className="text-lg font-semibold text-foreground">Bookings</h2>
             <p className="text-sm text-muted-foreground">Showing {filteredBookings.length} of {bookings.length} bookings</p>
           </div>
@@ -408,7 +408,7 @@ export default function AdminDashboard() {
                 {/* Mobile list view */}
                 <div className="md:hidden p-4 space-y-4">
                   {filteredBookings.map((booking) => (
-                    <div key={booking.id} className="p-4 bg-muted/50 rounded-lg shadow-sm border border-border/30">
+                    <div key={booking.id} className="p-4 bg-muted/50 rounded-lg shadow-2xl drop-shadow-2xl">
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-medium text-foreground">{booking.customer_name}</p>
@@ -419,6 +419,9 @@ export default function AdminDashboard() {
                           <p className="text-muted-foreground text-xs">{format(new Date(booking.booking_date), 'MMM dd')}</p>
                           <p className="text-muted-foreground text-xs">{formatTimeTo12Hour(booking.start_time)} - {formatTimeTo12Hour(booking.end_time)}</p>
                         </div>
+                      </div>
+                      <div className="mt-2 mb-3 text-muted-foreground text-xs">
+                        <p>Courts: <span className="font-medium text-foreground">{booking.number_of_courts}</span></p>
                       </div>
                       <div className="mt-3 flex items-center justify-between">
                         <div>{getStatusBadge(booking.status)}</div>
