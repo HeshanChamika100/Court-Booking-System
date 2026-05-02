@@ -326,14 +326,38 @@ This link expires in 30 minutes.
 // Send email function
 export async function sendEmail(to: string, subject: string, html: string, text: string) {
   try {
-    const resendApiKey = process.env.RESEND_API_KEY?.trim()
     const smtpHost = process.env.SMTP_HOST
     const smtpPort = process.env.SMTP_PORT
     const smtpUser = process.env.SMTP_USER
     const smtpPassword = process.env.SMTP_PASSWORD
     const fromEmail = process.env.SMTP_FROM_EMAIL || 'noreply@wijayasports.com'
 
-    // Use Resend if API key is configured
+    // Use Gmail SMTP first.
+    if (smtpHost && smtpPort && smtpUser && smtpPassword) {
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: parseInt(smtpPort),
+        secure: smtpPort === '465',
+        auth: {
+          user: smtpUser,
+          pass: smtpPassword,
+        },
+      })
+
+      const info = await transporter.sendMail({
+        from: fromEmail,
+        to,
+        subject,
+        html,
+        text,
+      })
+
+      console.log('[v0] Email sent:', info.messageId)
+      return true
+    }
+
+    // Fall back to Resend if SMTP is not configured.
+    const resendApiKey = process.env.RESEND_API_KEY?.trim()
     if (resendApiKey) {
       const resend = new Resend(resendApiKey)
       const { data, error } = await resend.emails.send({
@@ -352,7 +376,6 @@ export async function sendEmail(to: string, subject: string, html: string, text:
       return true
     }
 
-    // Fall back to SMTP if configured
     if (!smtpHost || !smtpPort || !smtpUser || !smtpPassword) {
       console.log('[v0] Email service not configured. Logging email instead:')
       console.log(`[v0] To: ${to}`)
@@ -360,29 +383,6 @@ export async function sendEmail(to: string, subject: string, html: string, text:
       console.log(`[v0] HTML Content: ${html.substring(0, 100)}...`)
       return true
     }
-
-    // Create transporter
-    const transporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: parseInt(smtpPort),
-      secure: smtpPort === '465',
-      auth: {
-        user: smtpUser,
-        pass: smtpPassword,
-      },
-    })
-
-    // Send email
-    const info = await transporter.sendMail({
-      from: fromEmail,
-      to,
-      subject,
-      html,
-      text,
-    })
-
-    console.log('[v0] Email sent:', info.messageId)
-    return true
   } catch (error) {
     console.error('[v0] Error sending email:', error)
     return false
