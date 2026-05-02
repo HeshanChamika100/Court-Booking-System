@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -22,29 +22,15 @@ export default function AdminDashboard() {
   const [actionError, setActionError] = useState('')
   const [activeTab, setActiveTab] = useState<'bookings' | 'courts'>('bookings')
   const [deleteConfirm, setDeleteConfirm] = useState<Booking | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
 
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const res = await fetch('/api/admin/session')
-        if (!res.ok) {
-          router.push('/admin')
-          return
-        }
-
-        await loadBookings()
-      } catch {
-        router.push('/admin')
-      } finally {
-        setCheckingSession(false)
-      }
+  const loadBookings = useCallback(async (silent = false) => {
+    if (silent) {
+      setRefreshing(true)
+    } else {
+      setLoading(true)
     }
 
-    void checkSession()
-  }, [router])
-
-  const loadBookings = async () => {
-    setLoading(true)
     try {
       const res = await fetch('/api/bookings')
       if (res.status === 401) {
@@ -58,9 +44,66 @@ export default function AdminDashboard() {
     } catch (err) {
       console.error('[v0] Error loading bookings:', err)
     } finally {
-      setLoading(false)
+      if (silent) {
+        setRefreshing(false)
+      } else {
+        setLoading(false)
+      }
     }
-  }
+  }, [router])
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const res = await fetch('/api/admin/session')
+        if (!res.ok) {
+          router.push('/admin')
+          return
+        }
+      } catch {
+        router.push('/admin')
+      } finally {
+        setCheckingSession(false)
+      }
+    }
+
+    void checkSession()
+  }, [router])
+
+  useEffect(() => {
+    if (checkingSession) {
+      return
+    }
+
+    void loadBookings()
+  }, [checkingSession, loadBookings])
+
+  useEffect(() => {
+    if (checkingSession || activeTab !== 'bookings') {
+      return
+    }
+
+    const refreshBookings = () => {
+      void loadBookings(true)
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refreshBookings()
+      }
+    }
+
+    const intervalId = window.setInterval(refreshBookings, 10000)
+
+    window.addEventListener('focus', refreshBookings)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      window.clearInterval(intervalId)
+      window.removeEventListener('focus', refreshBookings)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [activeTab, checkingSession, loadBookings])
 
   const handleApprove = async (id: number) => {
     setActionLoading(id)
