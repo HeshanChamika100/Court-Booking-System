@@ -3,8 +3,13 @@ import { createBooking, getBookings, isRangeAvailable, isValidSlotForDate, getEf
 import { getBookingConfirmationEmail, sendEmail } from '@/lib/email'
 import { format } from 'date-fns'
 import { formatTimeWithoutSeconds } from '@/lib/utils'
+import { isAdminRequestAuthorized } from '@/lib/admin-session'
 
 export async function GET(request: NextRequest) {
+  if (!isAdminRequestAuthorized(request)) {
+    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const bookings = await getBookings()
     return NextResponse.json({ success: true, data: bookings }, { status: 200 })

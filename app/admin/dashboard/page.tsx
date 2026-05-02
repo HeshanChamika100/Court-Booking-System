@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -17,33 +17,93 @@ export default function AdminDashboard() {
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'declined' | 'cancelled'>('all')
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'tomorrow' | 'yesterday' | 'week' | 'month'>('all')
   const [loading, setLoading] = useState(true)
+  const [checkingSession, setCheckingSession] = useState(true)
   const [actionLoading, setActionLoading] = useState<number | null>(null)
   const [actionError, setActionError] = useState('')
   const [activeTab, setActiveTab] = useState<'bookings' | 'courts'>('bookings')
   const [deleteConfirm, setDeleteConfirm] = useState<Booking | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
 
-  useEffect(() => {
-    const token = localStorage.getItem('admin_token')
-    if (!token) {
-      router.push('/admin')
+  const loadBookings = useCallback(async (silent = false) => {
+    if (silent) {
+      setRefreshing(true)
     } else {
-      loadBookings()
+      setLoading(true)
     }
-  }, [router])
 
-  const loadBookings = async () => {
-    setLoading(true)
     try {
       const res = await fetch('/api/bookings')
+      if (res.status === 401) {
+        router.push('/admin')
+        return
+      }
+
       const data = await res.json()
       if (data.success) setBookings(data.data)
       else console.error('[v0] Error loading bookings:', data.message)
     } catch (err) {
       console.error('[v0] Error loading bookings:', err)
     } finally {
-      setLoading(false)
+      if (silent) {
+        setRefreshing(false)
+      } else {
+        setLoading(false)
+      }
     }
-  }
+  }, [router])
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const res = await fetch('/api/admin/session')
+        if (!res.ok) {
+          router.push('/admin')
+          return
+        }
+      } catch {
+        router.push('/admin')
+      } finally {
+        setCheckingSession(false)
+      }
+    }
+
+    void checkSession()
+  }, [router])
+
+  useEffect(() => {
+    if (checkingSession) {
+      return
+    }
+
+    void loadBookings()
+  }, [checkingSession, loadBookings])
+
+  useEffect(() => {
+    if (checkingSession || activeTab !== 'bookings') {
+      return
+    }
+
+    const refreshBookings = () => {
+      void loadBookings(true)
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refreshBookings()
+      }
+    }
+
+    const intervalId = window.setInterval(refreshBookings, 10000)
+
+    window.addEventListener('focus', refreshBookings)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      window.clearInterval(intervalId)
+      window.removeEventListener('focus', refreshBookings)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [activeTab, checkingSession, loadBookings])
 
   const handleApprove = async (id: number) => {
     setActionLoading(id)
@@ -54,6 +114,11 @@ export default function AdminDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'approved' }),
       })
+      if (res.status === 401) {
+        router.push('/admin')
+        return
+      }
+
       const data = await res.json()
       if (data.success) {
         setBookings((prev) => prev.map((b) => (b.id === id ? data.data : b)))
@@ -77,6 +142,11 @@ export default function AdminDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'declined' }),
       })
+      if (res.status === 401) {
+        router.push('/admin')
+        return
+      }
+
       const data = await res.json()
       if (data.success) {
         setBookings((prev) => prev.map((b) => (b.id === id ? data.data : b)))
@@ -94,6 +164,11 @@ export default function AdminDashboard() {
     setActionLoading(id)
     try {
       const res = await fetch(`/api/bookings/${id}`, { method: 'DELETE' })
+      if (res.status === 401) {
+        router.push('/admin')
+        return
+      }
+
       const data = await res.json()
       if (data.success) {
         setBookings((prev) => prev.filter((b) => b.id !== id))
@@ -109,9 +184,9 @@ export default function AdminDashboard() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('admin_token')
-    localStorage.removeItem('admin_login_time')
-    router.push('/admin')
+    void fetch('/api/admin/logout', { method: 'POST' }).finally(() => {
+      router.push('/admin')
+    })
   }
 
   const isBookingInDateRange = (bookingDate: string): boolean => {
@@ -181,6 +256,14 @@ export default function AdminDashboard() {
     }
   }
 
+  if (checkingSession) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+        <p className="text-sm uppercase tracking-[0.3em] text-white/70">Verifying admin session</p>
+      </div>
+    )
+  }
+
   return (
     <div
       className="relative min-h-screen overflow-hidden bg-cover bg-center bg-fixed"
@@ -238,24 +321,24 @@ export default function AdminDashboard() {
 
       <main className="container mx-auto px-4 py-8">
         {/* Statistics */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-6 mb-8">
-          <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
+        <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 snap-x snap-mandatory sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0 md:grid-cols-5 mb-8">
+          <Card className="min-w-[64%] snap-start p-4 sm:min-w-0 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
             <p className="text-sm text-white/85 mb-2">Total Bookings</p>
             <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.total}</p>
           </Card>
-          <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
+          <Card className="min-w-[64%] snap-start p-4 sm:min-w-0 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
             <p className="text-sm text-white/85 mb-2 flex items-center"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-yellow-400/90" />Pending</p>
             <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.pending}</p>
           </Card>
-          <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
+          <Card className="min-w-[64%] snap-start p-4 sm:min-w-0 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
             <p className="text-sm text-white/85 mb-2 flex items-center"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-emerald-400/90" />Approved</p>
             <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.approved}</p>
           </Card>
-          <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
+          <Card className="min-w-[64%] snap-start p-4 sm:min-w-0 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
             <p className="text-sm text-white/85 mb-2 flex items-center"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-rose-400/90" />Declined</p>
             <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.declined}</p>
           </Card>
-          <Card className="p-4 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
+          <Card className="min-w-[64%] snap-start p-4 sm:min-w-0 sm:p-6 rounded-2xl border border-white/10 bg-slate-900/85 backdrop-blur-sm shadow-xl">
             <p className="text-sm text-white/85 mb-2 flex items-center"><span className="inline-block w-2.5 h-2.5 rounded-full mr-2 bg-slate-400/90" />Cancelled</p>
             <p className="text-4xl sm:text-5xl font-extrabold text-white leading-none drop-shadow-md">{stats.cancelled}</p>
           </Card>
@@ -350,7 +433,7 @@ export default function AdminDashboard() {
 
         {/* Bookings Table */}
         <Card className="rounded-2xl bg-white overflow-hidden border border-border/50">
-          <div className="p-4 border-b border-border/30 bg-white">
+          <div className="p-4 bg-white drop-shadow-2xl">
             <h2 className="text-lg font-semibold text-foreground">Bookings</h2>
             <p className="text-sm text-muted-foreground">Showing {filteredBookings.length} of {bookings.length} bookings</p>
           </div>
@@ -368,7 +451,7 @@ export default function AdminDashboard() {
                 {/* Mobile list view */}
                 <div className="md:hidden p-4 space-y-4">
                   {filteredBookings.map((booking) => (
-                    <div key={booking.id} className="p-4 bg-muted/50 rounded-lg shadow-sm border border-border/30">
+                    <div key={booking.id} className="p-4 bg-muted/50 rounded-lg shadow-2xl drop-shadow-2xl">
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-medium text-foreground">{booking.customer_name}</p>
@@ -379,6 +462,9 @@ export default function AdminDashboard() {
                           <p className="text-muted-foreground text-xs">{format(new Date(booking.booking_date), 'MMM dd')}</p>
                           <p className="text-muted-foreground text-xs">{formatTimeTo12Hour(booking.start_time)} - {formatTimeTo12Hour(booking.end_time)}</p>
                         </div>
+                      </div>
+                      <div className="mt-2 mb-3 text-muted-foreground text-xs">
+                        <p>Courts: <span className="font-medium text-foreground">{booking.number_of_courts}</span></p>
                       </div>
                       <div className="mt-3 flex items-center justify-between">
                         <div>{getStatusBadge(booking.status)}</div>

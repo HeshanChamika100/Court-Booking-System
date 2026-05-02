@@ -6,8 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import {
   Plus, Trash2, AlertCircle, CheckCircle, Loader2,
-  ToggleLeft, ToggleRight, CalendarOff, Clock4,
-  Pencil, X as XIcon, Check as CheckIcon,
+  CalendarOff, Clock4,
 } from 'lucide-react'
 import { type Court, type DateOverride } from '@/lib/supabase'
 import { formatTimeTo12Hour } from '@/lib/utils'
@@ -17,11 +16,17 @@ const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
 // ─── Confirmation Modal ───────────────────────────────────────────────────────
 
 function ConfirmModal({
+  title = 'Confirm Action',
   message,
+  confirmLabel = 'Confirm',
+  confirmClassName = 'bg-amber-500 hover:bg-amber-600 text-white',
   onConfirm,
   onCancel,
 }: {
+  title?: string
   message: string
+  confirmLabel?: string
+  confirmClassName?: string
   onConfirm: () => void
   onCancel: () => void
 }) {
@@ -31,17 +36,17 @@ function ConfirmModal({
         <div className="flex gap-3 mb-5">
           <AlertCircle className="w-6 h-6 text-amber-500 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold text-foreground mb-1">Existing Bookings Affected</p>
+            <p className="font-semibold text-foreground mb-1">{title}</p>
             <p className="text-sm text-muted-foreground">{message}</p>
           </div>
         </div>
         <div className="flex gap-3 justify-end">
           <Button variant="outline" onClick={onCancel}>Cancel</Button>
           <Button
-            className="bg-amber-500 hover:bg-amber-600 text-white"
+            className={confirmClassName}
             onClick={onConfirm}
           >
-            Proceed Anyway
+            {confirmLabel}
           </Button>
         </div>
       </div>
@@ -54,13 +59,9 @@ function ConfirmModal({
 function CourtsSection() {
   const [courts, setCourts] = useState<Court[]>([])
   const [loading, setLoading] = useState(true)
-  const [newName, setNewName] = useState('')
   const [adding, setAdding] = useState(false)
-  const [togglingId, setTogglingId] = useState<number | null>(null)
-  const [editingId, setEditingId] = useState<number | null>(null)
-  const [editName, setEditName] = useState('')
-  const [renamingId, setRenamingId] = useState<number | null>(null)
   const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [addConfirm, setAddConfirm] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<Court | null>(null)
   const [error, setError] = useState('')
 
@@ -74,63 +75,22 @@ function CourtsSection() {
 
   useEffect(() => { load() }, [load])
 
-  const handleAdd = async () => {
-    if (!newName.trim()) return
+  const handleAdd = async (name: string) => {
+    setAddConfirm(null)
     setAdding(true)
     setError('')
     const res = await fetch('/api/admin/courts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newName.trim() }),
+      body: JSON.stringify({ name }),
     })
     const data = await res.json()
     if (data.success) {
       setCourts((prev) => [...prev, data.data])
-      setNewName('')
     } else {
       setError(data.message)
     }
     setAdding(false)
-  }
-
-  const handleToggle = async (court: Court) => {
-    setTogglingId(court.id)
-    const res = await fetch(`/api/admin/courts/${court.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ is_active: !court.is_active }),
-    })
-    const data = await res.json()
-    if (data.success) setCourts((prev) => prev.map((c) => (c.id === court.id ? data.data : c)))
-    setTogglingId(null)
-  }
-
-  const startEdit = (court: Court) => {
-    setEditingId(court.id)
-    setEditName(court.name)
-  }
-
-  const cancelEdit = () => {
-    setEditingId(null)
-    setEditName('')
-  }
-
-  const handleRename = async (id: number) => {
-    if (!editName.trim()) return
-    setRenamingId(id)
-    const res = await fetch(`/api/admin/courts/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: editName.trim() }),
-    })
-    const data = await res.json()
-    if (data.success) {
-      setCourts((prev) => prev.map((c) => (c.id === id ? data.data : c)))
-      setEditingId(null)
-    } else {
-      setError(data.message)
-    }
-    setRenamingId(null)
   }
 
   const handleDelete = async (court: Court) => {
@@ -143,28 +103,36 @@ function CourtsSection() {
     setDeletingId(null)
   }
 
-  const active = courts.filter((c) => c.is_active).length
-
   return (
     <>
+      {addConfirm && (
+        <ConfirmModal
+          title="Add Court?"
+          message={`This will create ${addConfirm} and make it available for bookings.`}
+          confirmLabel="Add Court"
+          confirmClassName="bg-primary text-primary-foreground hover:bg-primary/90"
+          onConfirm={() => handleAdd(addConfirm)}
+          onCancel={() => setAddConfirm(null)}
+        />
+      )}
       {deleteConfirm && (
         <ConfirmModal
-          message={`Delete "${deleteConfirm.name}" permanently? This cannot be undone.`}
+          title="Remove Court?"
+          message={`Remove court? This cannot be undone.`}
+          confirmLabel="Remove"
+          confirmClassName="bg-amber-500 hover:bg-amber-600 text-white"
           onConfirm={() => handleDelete(deleteConfirm)}
           onCancel={() => setDeleteConfirm(null)}
         />
       )}
 
       <Card className="p-6 border border-border/50">
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-foreground text-lg">Courts</h3>
           <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
-            {active} active / {courts.length} total
+            {courts.length} total
           </span>
         </div>
-        <p className="text-sm text-muted-foreground mb-5">
-          Add, rename, delete, or toggle courts active/inactive. Only active courts count toward booking capacity.
-        </p>
 
         {error && (
           <div className="flex gap-2 p-3 mb-4 bg-destructive/10 border border-destructive/30 rounded-lg text-sm text-destructive">
@@ -172,134 +140,43 @@ function CourtsSection() {
           </div>
         )}
 
-        {/* Add court */}
-        <div className="flex gap-2 mb-5">
-          <Input
-            placeholder="e.g. Court 7"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-            className="bg-background border-input text-foreground placeholder-muted-foreground"
-          />
-          <Button onClick={handleAdd} disabled={adding || !newName.trim()} className="flex-shrink-0">
-            {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-            <span className="ml-1.5">Add</span>
-          </Button>
-        </div>
-
-        {/* Court list */}
         {loading ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="w-6 h-6 text-primary animate-spin" />
           </div>
         ) : (
-          <div className="space-y-2">
-            {courts.map((court) => (
+          <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 mb-4">
+            {courts.map((court, idx) => (
               <div
                 key={court.id}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${court.is_active
-                    ? 'bg-emerald-500/8 border-emerald-500/30'
-                    : 'bg-muted/50 border-border opacity-80'
-                  }`}
+                className="flex flex-col items-center justify-center p-2 sm:p-4 rounded-lg border-2 border-dashed border-border bg-gradient-to-br from-primary/5 to-primary/10 hover:border-primary/50 hover:bg-primary/15 transition-all group relative"
               >
-                {/* Status dot */}
-                <span className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${court.is_active ? 'bg-emerald-500' : 'bg-muted-foreground'}`} />
-
-                {/* Name / edit input */}
-                {editingId === court.id ? (
-                  <input
-                    autoFocus
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleRename(court.id)
-                      if (e.key === 'Escape') cancelEdit()
-                    }}
-                    className="flex-1 px-2 py-0.5 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-sky-500/30 min-w-0"
-                  />
-                ) : (
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <span className="font-medium text-sm text-foreground truncate">{court.name}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${court.is_active ? 'bg-emerald-500/15 text-emerald-700' : 'bg-muted text-muted-foreground'
-                      }`}>
-                      {court.is_active ? 'Active' : 'Inactive'}
-                    </span>
-                  </div>
-                )}
-
-                {/* Action buttons */}
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  {editingId === court.id ? (
-                    <>
-                      {/* Confirm rename */}
-                      <button
-                        onClick={() => handleRename(court.id)}
-                        disabled={renamingId === court.id || !editName.trim()}
-                        className="p-1.5 rounded-md text-emerald-600 hover:bg-emerald-500/10 transition-colors"
-                        title="Save name"
-                      >
-                        {renamingId === court.id
-                          ? <Loader2 className="w-4 h-4 animate-spin" />
-                          : <CheckIcon className="w-4 h-4" />
-                        }
-                      </button>
-                      {/* Cancel rename */}
-                      <button
-                        onClick={cancelEdit}
-                        className="p-1.5 rounded-md text-muted-foreground hover:bg-muted transition-colors"
-                        title="Cancel"
-                      >
-                        <XIcon className="w-4 h-4" />
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      {/* Edit name */}
-                      <button
-                        onClick={() => startEdit(court)}
-                        className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                        title="Rename court"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-
-                      {/* Toggle active */}
-                      <button
-                        onClick={() => handleToggle(court)}
-                        disabled={togglingId === court.id}
-                        className="p-1.5 rounded-md text-muted-foreground hover:text-foreground transition-colors"
-                        title={court.is_active ? 'Deactivate' : 'Activate'}
-                      >
-                        {togglingId === court.id
-                          ? <Loader2 className="w-5 h-5 animate-spin" />
-                          : court.is_active
-                            ? <ToggleRight className="w-5 h-5 text-emerald-500" />
-                            : <ToggleLeft className="w-5 h-5" />
-                        }
-                      </button>
-
-                      {/* Delete */}
-                      <button
-                        onClick={() => setDeleteConfirm(court)}
-                        disabled={deletingId === court.id}
-                        className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                        title="Delete court"
-                      >
-                        {deletingId === court.id
-                          ? <Loader2 className="w-4 h-4 animate-spin" />
-                          : <Trash2 className="w-4 h-4" />
-                        }
-                      </button>
-                    </>
-                  )}
-                </div>
+                <span className="text-base sm:text-2xl font-bold text-primary leading-none">{idx + 1}</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground mt-1 font-medium leading-none">Court</span>
+                <button
+                  onClick={() => setDeleteConfirm(court)}
+                  disabled={deletingId === court.id}
+                  className="absolute top-1 right-1 p-0.5 sm:p-1 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
+                  title="Remove court"
+                >
+                  {deletingId === court.id
+                    ? <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                    : <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  }
+                </button>
               </div>
             ))}
-            {courts.length === 0 && (
-              <p className="text-center text-sm text-muted-foreground py-6">No courts found.</p>
-            )}
           </div>
         )}
+
+        <Button
+          onClick={() => setAddConfirm(`Court ${courts.length + 1}`)}
+          disabled={adding}
+          className="w-full"
+        >
+          {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+          <span className="ml-1.5">Add Court</span>
+        </Button>
       </Card>
     </>
   )

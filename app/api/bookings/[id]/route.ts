@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getBookingById, updateBookingStatus, deleteBooking } from '@/lib/supabase'
 import { getApprovalEmail, getDeclinedEmail, sendEmail } from '@/lib/email'
+import { sendWhatsAppMessage } from '@/lib/whatsapp'
 import { format } from 'date-fns'
 import { formatTimeWithoutSeconds } from '@/lib/utils'
+import { isAdminRequestAuthorized } from '@/lib/admin-session'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!isAdminRequestAuthorized(request)) {
+    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const { id } = await params
     const bookingId = parseInt(id)
@@ -34,6 +40,10 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!isAdminRequestAuthorized(request)) {
+    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const { id } = await params
     const bookingId = parseInt(id)
@@ -112,7 +122,29 @@ export async function PATCH(
       emailTemplate = getDeclinedEmail(booking.customer_name)
     }
 
-    await sendEmail(booking.email, emailTemplate.subject, emailTemplate.html, emailTemplate.text)
+    const emailNotification = sendEmail(
+      booking.email,
+      emailTemplate.subject,
+      emailTemplate.html,
+      emailTemplate.text
+    )
+
+    const notificationTasks = [emailNotification]
+
+    if (status === 'approved') {
+      const approvalWhatsAppMessage = `Hi ${booking.customer_name}, your court booking for ${format(new Date(booking.booking_date), 'MMMM dd, yyyy')} from ${formatTimeWithoutSeconds(booking.start_time)} to ${formatTimeWithoutSeconds(booking.end_time)} has been approved. Courts booked: ${booking.number_of_courts}. Please arrive 10 minutes early.`
+
+      notificationTasks.push(
+        sendWhatsAppMessage(booking.phone_number, approvalWhatsAppMessage)
+      )
+    }
+
+    const notificationResults = await Promise.allSettled(notificationTasks)
+    notificationResults.forEach((result) => {
+      if (result.status === 'rejected') {
+        console.warn('[v0] Booking notification warning:', result.reason)
+      }
+    })
 
     return NextResponse.json(
       { success: true, message: `Booking ${status}`, data: updatedBooking },
@@ -131,6 +163,10 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!isAdminRequestAuthorized(request)) {
+    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const { id } = await params
     const bookingId = parseInt(id)

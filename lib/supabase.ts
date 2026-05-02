@@ -290,20 +290,6 @@ export async function toggleCourtActive(id: number, is_active: boolean): Promise
   return data as Court
 }
 
-export async function renameCourt(id: number, name: string): Promise<Court | null> {
-  const { data, error } = await supabaseAdmin
-    .from('courts')
-    .update({ name })
-    .eq('id', id)
-    .select()
-    .single()
-  if (error) {
-    console.error('[v0] Error renaming court:', error)
-    return null
-  }
-  return data as Court
-}
-
 export async function deleteCourt(id: number): Promise<boolean> {
   const { error } = await supabaseAdmin.from('courts').delete().eq('id', id)
   if (error) {

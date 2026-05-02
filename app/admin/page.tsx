@@ -19,24 +19,28 @@ export default function AdminLogin() {
     setError('')
     setLoading(true)
 
-    // Verify admin password
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123'
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      })
 
-    if (password === adminPassword) {
-      // Set session token in localStorage
-      localStorage.setItem('admin_token', 'true')
-      localStorage.setItem('admin_login_time', new Date().getTime().toString())
-      
-      router.push('/admin/dashboard')
-    } else {
-      setError('Invalid password. Please try again.')
+      const data = await res.json()
+      if (res.ok && data.success) {
+        router.push('/admin/dashboard')
+      } else {
+        setError(data.message || 'Invalid password. Please try again.')
+      }
+    } catch {
+      setError('Unable to sign in right now. Please try again.')
     }
 
     setLoading(false)
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-background to-secondary/20 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <div className="w-16 h-16 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -50,7 +54,7 @@ export default function AdminLogin() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="flex gap-3 p-4 bg-destructive/10 border border-destructive/30 rounded-lg">
-                <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
                 <p className="text-destructive text-sm">{error}</p>
               </div>
             )}
@@ -83,9 +87,10 @@ export default function AdminLogin() {
             </Button>
           </form>
 
-          <div className="mt-6 p-4 bg-muted/50 rounded-lg text-center border border-border/50">
-            <p className="text-xs text-muted-foreground mb-1">Demo Credentials</p>
-            <p className="text-sm font-mono font-semibold text-foreground">admin123</p>
+          <div className="mt-4 text-center">
+            <Link href="/admin/reset" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Forgot password?
+            </Link>
           </div>
         </Card>
 
