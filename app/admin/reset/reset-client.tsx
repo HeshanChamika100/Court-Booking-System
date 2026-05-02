@@ -85,7 +85,7 @@ export default function AdminResetClient() {
             <Lock className="w-8 h-8 text-primary-foreground" />
           </div>
           <h1 className="text-3xl font-bold text-foreground">Admin Password Reset</h1>
-          <p className="text-muted-foreground mt-2">Wijaya Sports Club</p>
+          <p className="text-muted-foreground mt-2">Badminton Club</p>
         </div>
 
         <Card className="p-8 border border-border/50 shadow-lg">
@@ -177,7 +177,7 @@ export default function AdminResetClient() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@wijayasports.com"
+                  placeholder="admin@badmintonclub.lk"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required

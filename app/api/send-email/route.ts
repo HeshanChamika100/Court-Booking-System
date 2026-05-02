@@ -75,7 +75,7 @@ function generateConfirmationEmail(
   return `
 Dear ${name},
 
-Thank you for submitting your court booking request at Wijaya Sports Club - Padukka.
+Thank you for submitting your court booking request at Badminton Club - Padukka.
 
 Booking Details:
 - Date: ${date}
@@ -85,7 +85,7 @@ Booking Details:
 Your booking is currently pending approval. Our admin team will review your request and send you a confirmation or decline email shortly.
 
 Best regards,
-Wijaya Sports Club Admin Team
+Badminton Club Admin Team
   `.trim();
 }
 
@@ -108,10 +108,10 @@ Booking Confirmed:
 
 Please arrive 10 minutes before your scheduled time. If you need to make any changes, please contact us as soon as possible.
 
-Thank you for choosing Wijaya Sports Club - Padukka!
+Thank you for choosing Badminton Club - Padukka!
 
 Best regards,
-Wijaya Sports Club Admin Team
+Badminton Club Admin Team
   `.trim();
 }
 
@@ -119,7 +119,7 @@ function generateDeclineEmail(name: string): string {
   return `
 Dear ${name},
 
-Thank you for your interest in booking courts at Wijaya Sports Club - Padukka.
+Thank you for your interest in booking courts at Badminton Club - Padukka.
 
 Unfortunately, your booking request has been DECLINED. This may be due to:
 - The requested time slot is not available
@@ -128,6 +128,6 @@ Unfortunately, your booking request has been DECLINED. This may be due to:
 Please feel free to submit another booking request for a different date or time.
 
 Best regards,
-Wijaya Sports Club Admin Team
+Badminton Club Admin Team
   `.trim();
 }

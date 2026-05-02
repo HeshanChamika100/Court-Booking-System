@@ -47,7 +47,7 @@ export default function AdminLogin() {
             <Lock className="w-8 h-8 text-primary-foreground" />
           </div>
           <h1 className="text-3xl font-bold text-foreground">Admin Portal</h1>
-          <p className="text-muted-foreground mt-2">Wijaya Sports Club</p>
+          <p className="text-muted-foreground mt-2">Badminton Club</p>
         </div>
 
         <Card className="p-8 border border-border/50 shadow-lg">

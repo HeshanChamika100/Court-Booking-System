@@ -149,7 +149,7 @@ export default function CancelBookingPage() {
                 <Trophy className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-semibold tracking-tight text-white md:text-xl">Wijaya Sports Club</h1>
+                <h1 className="text-lg font-semibold tracking-tight text-white md:text-xl">Badminton Club</h1>
                 <p className="text-xs text-white/65">Padukka</p>
               </div>
             </div>
@@ -334,7 +334,7 @@ export default function CancelBookingPage() {
         {/* Footer */}
         <footer className="border-t border-white/10 bg-black/25 py-8 backdrop-blur-xl mt-auto">
           <div className="container mx-auto px-4 text-center text-xs text-white/60">
-            <p>&copy; {new Date().getFullYear()} Wijaya Sports Club. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Badminton Club. All rights reserved.</p>
           </div>
         </footer>
       </div>

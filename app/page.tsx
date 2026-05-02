@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button'
 import { CalendarDays, Users, Trophy, Shield, X } from 'lucide-react'
 
 export const metadata = {
-  title: 'Book Your Court - Wijaya Sports Club',
-  description: 'Book badminton courts at Wijaya Sports Club, Padukka. Easy online booking system.',
+  title: 'Book Your Court - Badminton Club',
+  description: 'Book badminton courts at Badminton Club, Padukka. Easy online booking system.',
 }
 
 export default function Home() {
@@ -24,7 +24,7 @@ export default function Home() {
                 <Trophy className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-semibold tracking-tight text-white md:text-xl">Wijaya Sports Club</h1>
+                <h1 className="text-lg font-semibold tracking-tight text-white md:text-xl">Badminton Club</h1>
                 <p className="text-xs text-white/65">Padukka</p>
               </div>
             </div>
@@ -54,7 +54,7 @@ export default function Home() {
                   Book badminton courts without the clutter.
                 </h2>
                 <p className="mt-4 md:mt-6 text-sm md:text-base lg:text-lg leading-6 md:leading-7 text-white/78">
-                  Reserve your slot at Wijaya Sports Club with a clean, fast booking flow and live court availability.
+                  Reserve your slot at Badminton Club with a clean, fast booking flow and live court availability.
                 </p>
 
                 <div className="mt-6 md:mt-8 grid gap-3 grid-cols-2 sm:grid-cols-3">
@@ -112,7 +112,7 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <div className="grid gap-6 sm:grid-cols-3 mb-6">
               <div>
-                <p className="font-semibold text-white">Wijaya Sports Club</p>
+                <p className="font-semibold text-white">Badminton Club</p>
                 <p className="text-sm text-white/70">Padukka, Sri Lanka</p>
               </div>
               <div>
@@ -121,7 +121,7 @@ export default function Home() {
                   <span className="text-white">Phone:</span> +94 71 234 5678
                 </p>
                 <p className="text-sm text-white/85">
-                  <span className="text-white">Email:</span> info@wijayasports.com
+                  <span className="text-white">Email:</span> info@badmintonclub.lk
                 </p>
               </div>
               <div>
@@ -131,7 +131,7 @@ export default function Home() {
               </div>
             </div>
             <div className="border-t border-white/10 pt-6 text-center text-xs text-white/60">
-              <p>&copy; {new Date().getFullYear()} Wijaya Sports Club. All rights reserved.</p>
+              <p>&copy; {new Date().getFullYear()} Badminton Club. All rights reserved.</p>
             </div>
           </div>
         </footer>

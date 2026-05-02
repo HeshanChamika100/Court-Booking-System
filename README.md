@@ -1,6 +1,8 @@
-# Wijaya Sports Club - Court Booking System
+# Badminton Club - Court Booking System
 
-A modern, full-featured court booking system for Wijaya Sports Club in Padukka, built with Next.js 16, Supabase, and TypeScript.
+A modern, full-featured court booking system for Badminton Club in Padukka, built with Next.js 16, Supabase, and TypeScript.
+
+Live site: [https://bminton-court-booking-system.vercel.app/](https://bminton-court-booking-system.vercel.app/)
 
 ## Features
 
@@ -229,6 +231,8 @@ The system calculates available slots based on:
 
 ### Deploy to Vercel
 
+Live deployment: [https://bminton-court-booking-system.vercel.app/](https://bminton-court-booking-system.vercel.app/)
+
 1. Push code to GitHub
 2. Connect repository to Vercel
 3. Set environment variables in Vercel Settings
@@ -313,7 +317,7 @@ For issues or questions, contact the development team.
 
 ## License
 
-Proprietary - Wijaya Sports Club, Padukka
+Proprietary - Badminton Club, Padukka
 
 ## Changelog
 

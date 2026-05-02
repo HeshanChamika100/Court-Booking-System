@@ -362,7 +362,7 @@ export function BookingForm() {
       <Card className="border border-white/20 bg-white/92 p-6 shadow-2xl shadow-black/20 ring-1 ring-white/30 backdrop-blur-2xl md:p-8">
         <div className="mb-6 text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-slate-950">Book Your Court</h2>
-          <p className="mt-1 text-sm text-slate-600">Wijaya Sports Club · 4:00 PM – 10:00 PM daily</p>
+          <p className="mt-1 text-sm text-slate-600">Badminton Club · 4:00 PM – 10:00 PM daily</p>
         </div>
 
         <StepIndicator current={step} />

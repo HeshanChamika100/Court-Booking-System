@@ -7,8 +7,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Wijaya Sports Club - Court Booking System',
-  description: 'Book badminton courts at Wijaya Sports Club, Padukka',
+  title: 'Badminton Club - Court Booking System',
+  description: 'Book badminton courts at Badminton Club, Padukka',
   generator: 'v0.app',
   icons: {
     icon: [

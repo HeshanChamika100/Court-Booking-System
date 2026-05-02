@@ -18,11 +18,11 @@ export function getBookingConfirmationEmail(
 ): EmailTemplate {
   return {
     to: customerName,
-    subject: 'Booking Request Received - Wijaya Sports Club',
+    subject: 'Booking Request Received - Badminton Club',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
-          <h1 style="margin: 0; font-size: 28px;">Wijaya Sports Club</h1>
+          <h1 style="margin: 0; font-size: 28px;">Badminton Club</h1>
           <p style="margin: 10px 0 0 0;">Court Booking Confirmation</p>
         </div>
         
@@ -60,7 +60,7 @@ export function getBookingConfirmationEmail(
           </p>
           
           <p style="color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-            This is an automated message. Please do not reply to this email. For inquiries, please contact us directly at info@wijayasports.com
+            This is an automated message. Please do not reply to this email. For inquiries, please contact us directly at info@badmintonclub.com
           </p>
         </div>
       </div>
@@ -68,7 +68,7 @@ export function getBookingConfirmationEmail(
     text: `
 Dear ${customerName},
 
-Thank you for your booking request at Wijaya Sports Club.
+Thank you for your booking request at Badminton Club.
 
 Booking Details:
 Date: ${bookingDate}
@@ -78,7 +78,7 @@ Number of Courts: ${numberOfCourts}
 Our admin team will review your request and get back to you with confirmation or to discuss availability.
 
 Best regards,
-Wijaya Sports Club Team
+Badminton Club Team
     `,
   }
 }
@@ -92,11 +92,11 @@ export function getApprovalEmail(
 ): EmailTemplate {
   return {
     to: customerName,
-    subject: 'Your Booking is Approved - Wijaya Sports Club',
+    subject: 'Your Booking is Approved - Badminton Club',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
-          <h1 style="margin: 0; font-size: 28px;">Wijaya Sports Club</h1>
+          <h1 style="margin: 0; font-size: 28px;">Badminton Club</h1>
           <p style="margin: 10px 0 0 0;">Booking Approved!</p>
         </div>
         
@@ -134,7 +134,7 @@ export function getApprovalEmail(
           </p>
           
           <p style="color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-            For any inquiries, please contact us at info@wijayasports.com
+            For any inquiries, please contact us at info@badmintonclub.com
           </p>
         </div>
       </div>
@@ -152,7 +152,7 @@ Number of Courts: ${numberOfCourts}
 Please arrive 10 minutes before your scheduled time.
 
 Best regards,
-Wijaya Sports Club Team
+Badminton Club Team
     `,
   }
 }
@@ -160,11 +160,11 @@ Wijaya Sports Club Team
 export function getDeclinedEmail(customerName: string): EmailTemplate {
   return {
     to: customerName,
-    subject: 'Booking Status Update - Wijaya Sports Club',
+    subject: 'Booking Status Update - Badminton Club',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
-          <h1 style="margin: 0; font-size: 28px;">Wijaya Sports Club</h1>
+          <h1 style="margin: 0; font-size: 28px;">Badminton Club</h1>
           <p style="margin: 10px 0 0 0;">Booking Status Update</p>
         </div>
         
@@ -184,11 +184,11 @@ export function getDeclinedEmail(customerName: string): EmailTemplate {
           </p>
           
           <p style="color: #666; line-height: 1.6;">
-            If you have any questions, please don't hesitate to reach out to us at info@wijayasports.com
+            If you have any questions, please don't hesitate to reach out to us at info@badmintonclub.com
           </p>
           
           <p style="color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-            We hope to see you soon at Wijaya Sports Club!
+            We hope to see you soon at Badminton Club!
           </p>
         </div>
       </div>
@@ -200,10 +200,10 @@ Unfortunately, we are unable to accommodate your booking request for the request
 
 Please try booking for a different date or time, or contact us directly to discuss alternative options.
 
-Contact us at: info@wijayasports.com
+Contact us at: info@badmintonclub.com
 
 Best regards,
-Wijaya Sports Club Team
+Badminton Club Team
     `,
   }
 }
@@ -217,11 +217,11 @@ export function getCancellationEmail(
 ): EmailTemplate {
   return {
     to: customerName,
-    subject: 'Booking Cancelled - Wijaya Sports Club',
+    subject: 'Booking Cancelled - Badminton Club',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
-          <h1 style="margin: 0; font-size: 28px;">Wijaya Sports Club</h1>
+          <h1 style="margin: 0; font-size: 28px;">Badminton Club</h1>
           <p style="margin: 10px 0 0 0;">Booking Cancelled</p>
         </div>
         
@@ -259,7 +259,7 @@ export function getCancellationEmail(
           </p>
           
           <p style="color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-            For any inquiries, please contact us at info@wijayasports.com
+            For any inquiries, please contact us at info@badmintonclub.com
           </p>
         </div>
       </div>
@@ -277,7 +277,7 @@ Number of Courts: ${numberOfCourts}
 If you would like to book another time slot, please visit our website to make a new booking request.
 
 Best regards,
-Wijaya Sports Club Team
+Badminton Club Team
     `,
   }
 }
@@ -285,11 +285,11 @@ Wijaya Sports Club Team
 export function getAdminPasswordResetEmail(resetUrl: string): EmailTemplate {
   return {
     to: 'admin',
-    subject: 'Reset Your Admin Password - Wijaya Sports Club',
+    subject: 'Reset Your Admin Password - Badminton Club',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: linear-gradient(135deg, #0f172a 0%, #334155 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
-          <h1 style="margin: 0; font-size: 28px;">Wijaya Sports Club</h1>
+          <h1 style="margin: 0; font-size: 28px;">Badminton Club</h1>
           <p style="margin: 10px 0 0 0;">Admin Password Reset</p>
         </div>
 
@@ -314,7 +314,7 @@ export function getAdminPasswordResetEmail(resetUrl: string): EmailTemplate {
       </div>
     `,
     text: `
-Reset your admin password for Wijaya Sports Club:
+Reset your admin password for Badminton Club:
 
 ${resetUrl}
 
@@ -330,7 +330,7 @@ export async function sendEmail(to: string, subject: string, html: string, text:
     const smtpPort = process.env.SMTP_PORT
     const smtpUser = process.env.SMTP_USER
     const smtpPassword = process.env.SMTP_PASSWORD
-    const fromEmail = process.env.SMTP_FROM_EMAIL || 'noreply@wijayasports.com'
+    const fromEmail = process.env.SMTP_FROM_EMAIL || 'noreply@badmintonclub.com'
 
     // Use Gmail SMTP first.
     if (smtpHost && smtpPort && smtpUser && smtpPassword) {
