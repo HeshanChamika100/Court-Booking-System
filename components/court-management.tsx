@@ -16,11 +16,17 @@ const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
 // ─── Confirmation Modal ───────────────────────────────────────────────────────
 
 function ConfirmModal({
+  title = 'Confirm Action',
   message,
+  confirmLabel = 'Confirm',
+  confirmClassName = 'bg-amber-500 hover:bg-amber-600 text-white',
   onConfirm,
   onCancel,
 }: {
+  title?: string
   message: string
+  confirmLabel?: string
+  confirmClassName?: string
   onConfirm: () => void
   onCancel: () => void
 }) {
@@ -30,17 +36,17 @@ function ConfirmModal({
         <div className="flex gap-3 mb-5">
           <AlertCircle className="w-6 h-6 text-amber-500 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold text-foreground mb-1">Existing Bookings Affected</p>
+            <p className="font-semibold text-foreground mb-1">{title}</p>
             <p className="text-sm text-muted-foreground">{message}</p>
           </div>
         </div>
         <div className="flex gap-3 justify-end">
           <Button variant="outline" onClick={onCancel}>Cancel</Button>
           <Button
-            className="bg-amber-500 hover:bg-amber-600 text-white"
+            className={confirmClassName}
             onClick={onConfirm}
           >
-            Proceed Anyway
+            {confirmLabel}
           </Button>
         </div>
       </div>
@@ -55,6 +61,7 @@ function CourtsSection() {
   const [loading, setLoading] = useState(true)
   const [adding, setAdding] = useState(false)
   const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [addConfirm, setAddConfirm] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<Court | null>(null)
   const [error, setError] = useState('')
 
@@ -68,13 +75,14 @@ function CourtsSection() {
 
   useEffect(() => { load() }, [load])
 
-  const handleAdd = async () => {
+  const handleAdd = async (name: string) => {
+    setAddConfirm(null)
     setAdding(true)
     setError('')
     const res = await fetch('/api/admin/courts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: `Court ${courts.length + 1}` }),
+      body: JSON.stringify({ name }),
     })
     const data = await res.json()
     if (data.success) {
@@ -97,9 +105,22 @@ function CourtsSection() {
 
   return (
     <>
+      {addConfirm && (
+        <ConfirmModal
+          title="Add Court?"
+          message={`This will create ${addConfirm} and make it available for bookings.`}
+          confirmLabel="Add Court"
+          confirmClassName="bg-primary text-primary-foreground hover:bg-primary/90"
+          onConfirm={() => handleAdd(addConfirm)}
+          onCancel={() => setAddConfirm(null)}
+        />
+      )}
       {deleteConfirm && (
         <ConfirmModal
+          title="Remove Court?"
           message={`Remove court? This cannot be undone.`}
+          confirmLabel="Remove"
+          confirmClassName="bg-amber-500 hover:bg-amber-600 text-white"
           onConfirm={() => handleDelete(deleteConfirm)}
           onCancel={() => setDeleteConfirm(null)}
         />
@@ -148,7 +169,11 @@ function CourtsSection() {
           </div>
         )}
 
-        <Button onClick={handleAdd} disabled={adding} className="w-full">
+        <Button
+          onClick={() => setAddConfirm(`Court ${courts.length + 1}`)}
+          disabled={adding}
+          className="w-full"
+        >
           {adding ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
           <span className="ml-1.5">Add Court</span>
         </Button>
